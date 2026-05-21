@@ -5,4 +5,4 @@ bin/
 *.obj
 .vscode/
 *.log
-PHASE1-README.md
+./PHASE1-README.md
