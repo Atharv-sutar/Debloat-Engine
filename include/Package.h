@@ -124,18 +124,66 @@ struct Package
     {
         // Common bloatware packages to identify
         static const std::vector<std::string> bloatwarePatterns = {
+            // Facebook Meta Services
             "com.facebook.services",
             "com.facebook.appmanager",
-            "com.netflix.partner.activation",
+            "com.facebook.system",
+
+            // Amazon / Netflix partner preload
             "com.amazon.appmanager",
+            "com.amazon.avod.thirdpartyclient",
+            "com.netflix.partner.activation",
+
+            // Booking / Opera preload
             "com.booking",
+            "com.booking.us",
             "com.opera.browser",
+            "com.opera.preinstall",
+
+            // Xiaomi safe removals
             "com.miui.analytics",
-            "com.xiaomi.health",
-            "com.miui.weather2",
+            "com.miui.msa.global",
             "com.xiaomi.mipicks",
+            "com.xiaomi.discover",
+            "com.miui.weather2",
+            "com.miui.hybrid",
+            "com.miui.hybrid.accessory",
+            "com.miui.player",
+            "com.miui.videoplayer",
+            "com.miui.yellowpage",
+            "com.miui.bugreport",
+            "com.miui.android.fashiongallery",
+            "com.xiaomi.gamecenter",
+
+            // Samsung safe removals
             "com.samsung.android.game.gamehome",
-            "com.samsung.android.themestore"};
+            "com.samsung.android.game.gametools",
+            "com.samsung.android.game.gos",
+            "com.samsung.android.themestore",
+            "com.samsung.android.themecenter",
+            "com.samsung.android.aremoji",
+            "com.samsung.android.arzone",
+            "com.samsung.android.app.spage",
+            "com.samsung.android.tvplus",
+            "com.samsung.android.stickercenter",
+            "com.samsung.android.app.tips",
+
+            // OnePlus / Oppo / Realme
+            "com.oneplus.store",
+            "com.oneplus.membership",
+            "com.heytap.browser",
+            "com.heytap.market",
+            "com.heytap.themestore",
+            "com.heytap.community",
+            "com.coloros.gamespace",
+            "com.realmestore.app",
+
+            // Vivo
+            "com.vivo.browser",
+            "com.vivo.appstore",
+            "com.vivo.easyshare",
+            "com.bbk.appstore",
+            "com.bbk.theme"};
 
         for (const auto &pattern : bloatwarePatterns)
         {
