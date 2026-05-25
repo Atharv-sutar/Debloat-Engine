@@ -62,32 +62,51 @@ struct Package
         // List of critical Android system packages that should never be touched
         static const std::vector<std::string> criticalPackages =
             {
+                // Core Android
                 "android",
-                "com.android.internal",
-                "com.android.providers",
                 "com.android.systemui",
+                "com.android.settings",
                 "com.android.shell",
                 "com.android.phone",
-                "com.android.server",
+                "com.android.providers",
                 "com.android.permissioncontroller",
                 "com.android.networkstack",
                 "com.android.bluetooth",
                 "com.android.externalstorage",
+                "com.android.launcher",
+                "com.android.packageinstaller",
+                "com.android.vending",
 
-                // Qualcomm / IMS
-                "com.qualcomm",
+                // Google Core Services
+                "com.google.android.gms",
+                "com.google.android.gsf",
+                "com.google.android.ext.services",
+
+                // Qualcomm / IMS / Telephony
+                "com.qualcomm.qti",
                 "com.qti",
                 "com.qcril",
-                "com.ims",
+                "com.qualcomm.qcrilmsgtunnel",
+                "com.android.ims",
+                "org.codeaurora.ims",
+
+                // Samsung critical
+                "com.samsung.android.providers",
+                "com.samsung.android.dialer",
+                "com.samsung.android.incallui",
 
                 // Xiaomi critical
                 "com.miui.securitycenter",
                 "com.miui.securitycore",
                 "com.miui.powerkeeper",
-                "com.miui.core",
-                "com.miui.system",
                 "com.xiaomi.xmsf",
-                "com.xiaomi.xmsfkeeper"};
+
+                // OnePlus / Oppo / Realme critical
+                "com.oplus.securitypermission",
+                "com.coloros.securitypermission",
+
+                // Vivo critical
+                "com.vivo.pem"};
 
         for (const auto &critical : criticalPackages)
         {
@@ -116,8 +135,7 @@ struct Package
             "com.miui.weather2",
             "com.xiaomi.mipicks",
             "com.samsung.android.game.gamehome",
-            "com.samsung.android.themestore"
-        };
+            "com.samsung.android.themestore"};
 
         for (const auto &pattern : bloatwarePatterns)
         {
@@ -134,14 +152,14 @@ struct Package
     bool IsAnalytics() const
     {
         static const std::vector<std::string> analyticsPatterns = {
-            "com.google.firebase",    // Firebase Analytics
-            "com.adjust",             // Adjust analytics
-            "com.amplitude",          // Amplitude analytics
-            "com.mixpanel",           // Mixpanel analytics
-            "com.flurry",             // Flurry analytics
-            "com.segment",            // Segment analytics
-            "com.appsflyer",          // AppsFlyer analytics
-            "com.crashlytics"         // Crashlytics analytics
+            "com.google.firebase", // Firebase Analytics
+            "com.adjust",          // Adjust analytics
+            "com.amplitude",       // Amplitude analytics
+            "com.mixpanel",        // Mixpanel analytics
+            "com.flurry",          // Flurry analytics
+            "com.segment",         // Segment analytics
+            "com.appsflyer",       // AppsFlyer analytics
+            "com.crashlytics"      // Crashlytics analytics
         };
 
         for (const auto &pattern : analyticsPatterns)
