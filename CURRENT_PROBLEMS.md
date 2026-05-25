@@ -7,6 +7,7 @@
 ## 25-5-2026  Modified Package.h  (Unsolved)
 ### 1. added more packages to critical,bloatware,analytics.
 ### 2. change PackageClassifier and PackageManager to now match the new packagae.h 
+### 3. Problems in PackageClassification and Package.h, Incorrect package classification for some packages like com.facebook.services, com.booking, com.google.firebase. 
 
 
 ## REFER FIX_PLAN.md to check upcoming tasks/problems
