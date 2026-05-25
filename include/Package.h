@@ -200,15 +200,37 @@ struct Package
     bool IsAnalytics() const
     {
         static const std::vector<std::string> analyticsPatterns = {
-            "com.google.firebase", // Firebase Analytics
-            "com.adjust",          // Adjust analytics
-            "com.amplitude",       // Amplitude analytics
-            "com.mixpanel",        // Mixpanel analytics
-            "com.flurry",          // Flurry analytics
-            "com.segment",         // Segment analytics
-            "com.appsflyer",       // AppsFlyer analytics
-            "com.crashlytics"      // Crashlytics analytics
-        };
+            // Firebase / Google analytics
+            "com.google.firebase",
+            "com.google.android.feedback",
+
+            // Common analytics SDKs
+            "com.adjust",
+            "com.amplitude",
+            "com.mixpanel",
+            "com.flurry",
+            "com.segment",
+            "com.appsflyer",
+            "com.crashlytics",
+
+            // Ads / tracking SDKs
+            "com.ironsource",
+            "com.inmobi",
+            "com.applovin",
+            "com.chartboost",
+            "com.tapjoy",
+            "com.vungle",
+
+            // Xiaomi analytics
+            "com.miui.analytics",
+            "com.miui.msa.global",
+
+            // Oppo/Realme telemetry
+            "com.oplus.statistics.rom",
+            "com.oplus.onetrace",
+
+            // Vivo telemetry
+            "com.vivo.analytics"};
 
         for (const auto &pattern : analyticsPatterns)
         {
