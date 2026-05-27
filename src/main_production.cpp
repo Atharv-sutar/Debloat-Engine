@@ -91,7 +91,7 @@ void DisplayPackagesWithCheckboxes(const std::vector<PackageClassification>& pac
     for (size_t i = 0; i < packages.size(); ++i)
     {
         bool isSelected = selected.count(packages[i].packageName) > 0;
-        std::string checkbox = isSelected ? "☑" : "☐";
+        std::string checkbox = isSelected ? "[X]" : "[ ]"; // erro, it prints ΓÿÉ instead of checkboxes, maybe console doesn't support unicode so
         std::string typeStr = (packages[i].canBeDisabled) ? "USR" : "SYS";
         std::string shortName = packages[i].packageName;
         if (shortName.length() > 35)
@@ -566,7 +566,7 @@ int main()
 
             std::cout << "\n[REMOVE OPTIONS]\n";
             std::cout << std::string(60, '-') << "\n";
-            std::cout << "1. Remove selected packages\n";
+            std::cout << "1. Remove Selected packages\n";
             std::cout << "2. Advanced removal (any classified package)\n";
             std::cout << "3. Cancel\n";
             std::cout << "Enter choice (1-3): ";
@@ -595,6 +595,7 @@ int main()
                 {
                     removalCandidates = safeToRemoveList;
                     removalCandidates.insert(removalCandidates.end(), optionalList.begin(), optionalList.end());
+                    removalCandidates.insert(removalCandidates.end(), analyticsList.begin(), analyticsList.end());
                 }
             }
             else if (removalMode == "2")
