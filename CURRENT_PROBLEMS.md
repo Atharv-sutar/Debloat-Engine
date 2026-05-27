@@ -11,7 +11,7 @@
 
 ## 27-5-2026 (Unsolved)
 ### 1. (CRITICAL) failure in classification: lists all packages in OTHER packages instead of UNKNOWN packages
-### 2. (FIXED) adb does not close properly after exitting program. adb.exe still runs in background
+
 
 
 
