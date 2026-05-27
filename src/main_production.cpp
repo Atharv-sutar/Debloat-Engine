@@ -881,7 +881,7 @@ int main()
     }
 
     logger.EndSession();
-
+    adbMgr.KillAdbServer();
     std::cout << "\nThank you for using DeBloat!\n";
     std::cout << "Logs saved to: logs/\n\n";
 
