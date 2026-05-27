@@ -326,6 +326,7 @@ int main()
     std::vector<std::string> selectedForRemoval;
     std::vector<PackageClassification> safeToRemoveList;
     std::vector<PackageClassification> optionalList;
+    std::vector<PackageClassification> analyticsList;
 
     while (running)
     {
@@ -418,8 +419,9 @@ int main()
             // Fetch updated classifications
             safeToRemoveList = classifier.ClassifyMultiple(allPkgs, PackageCategory::SAFE_TO_REMOVE);
             optionalList = classifier.ClassifyMultiple(allPkgs, PackageCategory::OPTIONAL);
+            analyticsList = classifier.ClassifyMultiple(allPkgs, PackageCategory::ANALYTICS);
 
-            if (safeToRemoveList.empty() && optionalList.empty())
+            if (safeToRemoveList.empty() && optionalList.empty() && analyticsList.empty())
             {
                 std::cout << "[INFO] No removable packages found on your device.\n";
                 std::cout << "Your device is already clean!\n\n";
@@ -454,8 +456,22 @@ int main()
                     std::cout << "\n";
                 }
 
+                if (!analyticsList.empty())
+                {
+                    std::cout << "ANALYTICS (Data Collection) [" << analyticsList.size() << "]:\n";
+                    std::cout << std::string(60, '-') << "\n";
+
+                    for (size_t i = 0; i < analyticsList.size(); ++i)
+                    {
+                        std::cout << std::setw(3) << (i + 1) << ". "
+                                 << std::setw(40) << analyticsList[i].packageName
+                                 << " (" << analyticsList[i].safetyScore << "%)\n";
+                    }
+                    std::cout << "\n";
+                }
+
                 std::cout << std::string(60, '-') << "\n";
-                std::cout << "Total: " << (safeToRemoveList.size() + optionalList.size()) << " removable packages\n\n";
+                std::cout << "Total: " << (safeToRemoveList.size() + optionalList.size() + analyticsList.size()) << " removable packages\n\n";
             }
 
             std::cout << "Press Enter to continue...";
@@ -546,6 +562,7 @@ int main()
         {
             safeToRemoveList = classifier.ClassifyMultiple(allPkgs, PackageCategory::SAFE_TO_REMOVE);
             optionalList = classifier.ClassifyMultiple(allPkgs, PackageCategory::OPTIONAL);
+            analyticsList = classifier.ClassifyMultiple(allPkgs, PackageCategory::ANALYTICS);
 
             std::cout << "\n[REMOVE OPTIONS]\n";
             std::cout << std::string(60, '-') << "\n";
@@ -756,6 +773,7 @@ int main()
 
             auto protectedPkgs = classifier.ClassifyMultiple(allPkgs, PackageCategory::DO_NOT_TOUCH);
             auto optionalPkgs = classifier.ClassifyMultiple(allPkgs, PackageCategory::OPTIONAL);
+            auto analyticsPkgs = classifier.ClassifyMultiple(allPkgs, PackageCategory::ANALYTICS);
             auto safePkgs = classifier.ClassifyMultiple(allPkgs, PackageCategory::SAFE_TO_REMOVE);
 
             std::cout << "DEVICE ANALYSIS REPORT\n";
@@ -773,7 +791,8 @@ int main()
             std::cout << "Protected (Do Not Remove):   " << std::setw(4) << protectedPkgs.size() << " packages\n";
             std::cout << "Bloatware (Safe to Remove):  " << std::setw(4) << safePkgs.size() << " packages\n";
             std::cout << "Optional (Consider Remove):  " << std::setw(4) << optionalPkgs.size() << " packages\n";
-            std::cout << "Total Removable:             " << std::setw(4) << (safePkgs.size() + optionalPkgs.size()) << " packages\n";
+            std::cout << "Analytics (Data Collection): " << std::setw(4) << analyticsPkgs.size() << " packages\n";
+            std::cout << "Total Removable:             " << std::setw(4) << (safePkgs.size() + optionalPkgs.size() + analyticsPkgs.size()) << " packages\n";
 
             std::cout << "\n\nPress Enter to continue...";
             std::getline(std::cin, choice);
