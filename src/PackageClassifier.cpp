@@ -292,11 +292,11 @@ void PackageClassifier::BuildDatabase()
     addDatabaseEntry("com.miui.analytics", PackageCategory::ANALYTICS, "MIUI analytics");
     addDatabaseEntry("com.miui.android.fashiongallery", PackageCategory::SAFE_TO_REMOVE, "MIUI fashion gallery");
     addDatabaseEntry("com.miui.bugreport", PackageCategory::SAFE_TO_REMOVE, "MIUI bugreport");
-    addDatabaseEntry("com.miui.calculator", PackageCategory::OPTIONAL, "MIUI calculator");
-    addDatabaseEntry("com.miui.cloudservice", PackageCategory::OPTIONAL, "MIUI cloud service");
-    addDatabaseEntry("com.miui.daemon", PackageCategory::OPTIONAL, "MIUI daemon");
-    addDatabaseEntry("com.miui.gallery", PackageCategory::OPTIONAL, "MIUI gallery");
-    addDatabaseEntry("com.miui.home", PackageCategory::OPTIONAL, "MIUI home");
+    addDatabaseEntry("com.miui.calculator", PackageCategory::DO_NOT_TOUCH, "MIUI calculator");
+    addDatabaseEntry("com.miui.cloudservice", PackageCategory::DO_NOT_TOUCH, "MIUI cloud service");
+    addDatabaseEntry("com.miui.daemon", PackageCategory::DO_NOT_TOUCH, "MIUI daemon");
+    addDatabaseEntry("com.miui.gallery", PackageCategory::DO_NOT_TOUCH, "MIUI gallery");
+    addDatabaseEntry("com.miui.home", PackageCategory::DO_NOT_TOUCH, "MIUI home");
     addDatabaseEntry("com.miui.hybrid", PackageCategory::SAFE_TO_REMOVE, "MIUI hybrid");
     addDatabaseEntry("com.miui.hybrid.accessory", PackageCategory::SAFE_TO_REMOVE, "MIUI hybrid accessory");
     addDatabaseEntry("com.miui.msa.global", PackageCategory::ANALYTICS, "MIUI MSA global");
