@@ -122,6 +122,286 @@ void PackageClassifier::BuildDatabase()
         database[pkg] = item;
     };
 
+    // Helper to add arbitrary database entries. Use this for bulk/pasted
+    // package mappings (from packages.md or other lists). Paste your
+    // `addDatabaseEntry("com.example.pkg", PackageCategory::SAFE_TO_REMOVE, "desc");`
+    // lines between the START/END markers below.
+    auto addDatabaseEntry = [this](const std::string& pkg,
+                                   PackageCategory cat,
+                                   const std::string& description)
+    {
+        PackageClassification item(pkg);
+        item.category = cat;
+        item.reason = "User-provided mapping";
+        item.description = description;
+        // Set reasonable defaults per category
+        switch (cat)
+        {
+        case PackageCategory::DO_NOT_TOUCH:
+            item.safetyScore = 0;
+            item.canBeDisabled = false;
+            break;
+        case PackageCategory::ANALYTICS:
+            item.safetyScore = 90;
+            item.canBeDisabled = true;
+            break;
+        case PackageCategory::SAFE_TO_REMOVE:
+            item.safetyScore = 85;
+            item.canBeDisabled = true;
+            break;
+        case PackageCategory::OPTIONAL:
+            item.safetyScore = 70;
+            item.canBeDisabled = true;
+            break;
+        case PackageCategory::USER_APP:
+            item.safetyScore = 95;
+            item.canBeDisabled = true;
+            break;
+        default:
+            item.safetyScore = 50;
+            item.canBeDisabled = true;
+            break;
+        }
+
+        database[pkg] = item;
+    };
+
+    // === START GENERATED DATABASE ENTRIES ===
+    addDatabaseEntry("android", PackageCategory::DO_NOT_TOUCH, "Core Android");
+    addDatabaseEntry("com.adobe.reader", PackageCategory::USER_APP, "Adobe Reader");
+    addDatabaseEntry("com.airtel.mobile.android", PackageCategory::USER_APP, "Airtel app");
+    addDatabaseEntry("com.amazon.appmanager", PackageCategory::SAFE_TO_REMOVE, "Amazon app manager");
+    addDatabaseEntry("com.amazon.avod.thirdpartyclient", PackageCategory::SAFE_TO_REMOVE, "Amazon/AVOD third-party client");
+    addDatabaseEntry("com.amazon.kindle", PackageCategory::SAFE_TO_REMOVE, "Amazon Kindle");
+    addDatabaseEntry("com.amazon.mShop.android.shopping", PackageCategory::SAFE_TO_REMOVE, "Amazon Shopping");
+    addDatabaseEntry("com.android.bluetooth", PackageCategory::DO_NOT_TOUCH, "Android Bluetooth");
+    addDatabaseEntry("com.android.browser", PackageCategory::OPTIONAL, "Android Browser");
+    addDatabaseEntry("com.android.calculator2", PackageCategory::OPTIONAL, "Calculator");
+    addDatabaseEntry("com.android.calendar", PackageCategory::OPTIONAL, "Calendar");
+    addDatabaseEntry("com.android.captiveportallogin", PackageCategory::DO_NOT_TOUCH, "Captive portal login");
+    addDatabaseEntry("com.android.carrierconfig", PackageCategory::DO_NOT_TOUCH, "Carrier config");
+    addDatabaseEntry("com.android.cellbroadcastreceiver", PackageCategory::DO_NOT_TOUCH, "Cell broadcast receiver");
+    addDatabaseEntry("com.android.contacts", PackageCategory::OPTIONAL, "Contacts");
+    addDatabaseEntry("com.android.deskclock", PackageCategory::OPTIONAL, "Desk clock");
+    addDatabaseEntry("com.android.documentsui", PackageCategory::DO_NOT_TOUCH, "Documents UI");
+    addDatabaseEntry("com.android.egg", PackageCategory::UNCATEGORIZED, "Easter egg/unknown");
+    addDatabaseEntry("com.android.email", PackageCategory::OPTIONAL, "Email");
+    addDatabaseEntry("com.android.externalstorage", PackageCategory::DO_NOT_TOUCH, "External storage");
+    addDatabaseEntry("com.android.gallery3d", PackageCategory::OPTIONAL, "Gallery");
+    addDatabaseEntry("com.android.hotwordenrollment.okgoogle", PackageCategory::DO_NOT_TOUCH, "Hotword enrollment");
+    addDatabaseEntry("com.android.hotwordenrollment.xgoogle", PackageCategory::DO_NOT_TOUCH, "Hotword enrollment (x)");
+    addDatabaseEntry("com.android.htmlviewer", PackageCategory::OPTIONAL, "HTML viewer");
+    addDatabaseEntry("com.android.ims", PackageCategory::DO_NOT_TOUCH, "IMS services");
+    addDatabaseEntry("com.android.keychain", PackageCategory::DO_NOT_TOUCH, "Keychain");
+    addDatabaseEntry("com.android.launcher", PackageCategory::DO_NOT_TOUCH, "Launcher");
+    addDatabaseEntry("com.android.launcher3", PackageCategory::DO_NOT_TOUCH, "Launcher3");
+    addDatabaseEntry("com.android.location.fused", PackageCategory::DO_NOT_TOUCH, "Fused location");
+    addDatabaseEntry("com.android.music", PackageCategory::OPTIONAL, "Music app");
+    addDatabaseEntry("com.android.networkstack", PackageCategory::DO_NOT_TOUCH, "Network stack");
+    addDatabaseEntry("com.android.nfc", PackageCategory::DO_NOT_TOUCH, "NFC");
+    addDatabaseEntry("com.android.packageinstaller", PackageCategory::DO_NOT_TOUCH, "Package installer");
+    addDatabaseEntry("com.android.permissioncontroller", PackageCategory::DO_NOT_TOUCH, "Permission controller");
+    addDatabaseEntry("com.android.phone", PackageCategory::DO_NOT_TOUCH, "Phone");
+    addDatabaseEntry("com.android.printspooler", PackageCategory::DO_NOT_TOUCH, "Print spooler");
+    addDatabaseEntry("com.android.providers.calendar", PackageCategory::DO_NOT_TOUCH, "Providers: calendar");
+    addDatabaseEntry("com.android.providers.contacts", PackageCategory::DO_NOT_TOUCH, "Providers: contacts");
+    addDatabaseEntry("com.android.providers.downloads", PackageCategory::DO_NOT_TOUCH, "Providers: downloads");
+    addDatabaseEntry("com.android.providers.media", PackageCategory::DO_NOT_TOUCH, "Providers: media");
+    addDatabaseEntry("com.android.providers.partnerbookmarks", PackageCategory::OPTIONAL, "Partner bookmarks");
+    addDatabaseEntry("com.android.providers.settings", PackageCategory::DO_NOT_TOUCH, "Providers: settings");
+    addDatabaseEntry("com.android.providers.telephony", PackageCategory::DO_NOT_TOUCH, "Providers: telephony");
+    addDatabaseEntry("com.android.proxyhandler", PackageCategory::DO_NOT_TOUCH, "Proxy handler");
+    addDatabaseEntry("com.android.server.telecom", PackageCategory::DO_NOT_TOUCH, "Server telecom");
+    addDatabaseEntry("com.android.settings", PackageCategory::DO_NOT_TOUCH, "Settings");
+    addDatabaseEntry("com.android.shell", PackageCategory::DO_NOT_TOUCH, "Shell");
+    addDatabaseEntry("com.android.soundrecorder", PackageCategory::OPTIONAL, "Sound recorder");
+    addDatabaseEntry("com.android.systemui", PackageCategory::DO_NOT_TOUCH, "System UI");
+    addDatabaseEntry("com.android.vending", PackageCategory::DO_NOT_TOUCH, "Google Play Store");
+    addDatabaseEntry("com.android.wallpaper.livepicker", PackageCategory::OPTIONAL, "Live wallpaper picker");
+    addDatabaseEntry("com.android.wifi", PackageCategory::DO_NOT_TOUCH, "WiFi service");
+    addDatabaseEntry("com.bbk.appstore", PackageCategory::SAFE_TO_REMOVE, "BBK appstore");
+    addDatabaseEntry("com.bbk.theme", PackageCategory::SAFE_TO_REMOVE, "BBK theme");
+    addDatabaseEntry("com.booking", PackageCategory::SAFE_TO_REMOVE, "Booking app");
+    addDatabaseEntry("com.booking.companion", PackageCategory::SAFE_TO_REMOVE, "Booking companion");
+    addDatabaseEntry("com.booking.us", PackageCategory::SAFE_TO_REMOVE, "Booking US");
+    addDatabaseEntry("com.brave.browser", PackageCategory::USER_APP, "Brave browser");
+    addDatabaseEntry("com.coloros.activation", PackageCategory::UNCATEGORIZED, "ColorOS activation");
+    addDatabaseEntry("com.coloros.filemanager", PackageCategory::OPTIONAL, "File manager");
+    addDatabaseEntry("com.coloros.gamespace", PackageCategory::SAFE_TO_REMOVE, "Game space");
+    addDatabaseEntry("com.coloros.securitypermission", PackageCategory::DO_NOT_TOUCH, "ColorOS security permission");
+    addDatabaseEntry("com.coloros.video", PackageCategory::OPTIONAL, "ColorOS video");
+    addDatabaseEntry("com.discord", PackageCategory::USER_APP, "Discord");
+    addDatabaseEntry("com.facebook.appmanager", PackageCategory::SAFE_TO_REMOVE, "Facebook App Manager");
+    addDatabaseEntry("com.facebook.katana", PackageCategory::SAFE_TO_REMOVE, "Facebook");
+    addDatabaseEntry("com.facebook.orca", PackageCategory::SAFE_TO_REMOVE, "Facebook Messenger");
+    addDatabaseEntry("com.facebook.services", PackageCategory::SAFE_TO_REMOVE, "Facebook services");
+    addDatabaseEntry("com.facebook.system", PackageCategory::SAFE_TO_REMOVE, "Facebook system");
+    addDatabaseEntry("com.flipkart.android", PackageCategory::USER_APP, "Flipkart");
+    addDatabaseEntry("com.google.android.apps.docs", PackageCategory::OPTIONAL, "Google Docs");
+    addDatabaseEntry("com.google.android.apps.maps", PackageCategory::OPTIONAL, "Google Maps");
+    addDatabaseEntry("com.google.android.apps.messaging", PackageCategory::OPTIONAL, "Google Messages");
+    addDatabaseEntry("com.google.android.apps.nexuslauncher", PackageCategory::OPTIONAL, "Nexus Launcher");
+    addDatabaseEntry("com.google.android.apps.photos", PackageCategory::OPTIONAL, "Google Photos");
+    addDatabaseEntry("com.google.android.apps.translate", PackageCategory::OPTIONAL, "Google Translate");
+    addDatabaseEntry("com.google.android.apps.walletnfcrel", PackageCategory::USER_APP, "Google Wallet");
+    addDatabaseEntry("com.google.android.apps.wallpaper", PackageCategory::OPTIONAL, "Google Wallpaper");
+    addDatabaseEntry("com.google.android.apps.youtube.music", PackageCategory::USER_APP, "YouTube Music");
+    addDatabaseEntry("com.google.android.configupdater", PackageCategory::DO_NOT_TOUCH, "Config updater");
+    addDatabaseEntry("com.google.android.contacts", PackageCategory::DO_NOT_TOUCH, "Google Contacts");
+    addDatabaseEntry("com.google.android.dialer", PackageCategory::OPTIONAL, "Google Dialer");
+    addDatabaseEntry("com.google.android.ext.services", PackageCategory::DO_NOT_TOUCH, "Google ext services");
+    addDatabaseEntry("com.google.android.ext.shared", PackageCategory::DO_NOT_TOUCH, "Google ext shared");
+    addDatabaseEntry("com.google.android.feedback", PackageCategory::ANALYTICS, "Google feedback/analytics");
+    addDatabaseEntry("com.google.android.gm", PackageCategory::OPTIONAL, "Gmail");
+    addDatabaseEntry("com.google.android.gms", PackageCategory::DO_NOT_TOUCH, "Google Play Services");
+    addDatabaseEntry("com.google.android.googlequicksearchbox", PackageCategory::OPTIONAL, "Google Search");
+    addDatabaseEntry("com.google.android.gsf", PackageCategory::DO_NOT_TOUCH, "Google Services Framework");
+    addDatabaseEntry("com.google.android.modulemetadata", PackageCategory::DO_NOT_TOUCH, "Module metadata");
+    addDatabaseEntry("com.google.android.odad", PackageCategory::ANALYTICS, "ODAD analytics");
+    addDatabaseEntry("com.google.android.onetimeinitializer", PackageCategory::DO_NOT_TOUCH, "One-time initializer");
+    addDatabaseEntry("com.google.android.partnersetup", PackageCategory::DO_NOT_TOUCH, "Partner setup");
+    addDatabaseEntry("com.google.android.permissioncontroller", PackageCategory::DO_NOT_TOUCH, "Permission controller");
+    addDatabaseEntry("com.google.android.syncadapters.calendar", PackageCategory::DO_NOT_TOUCH, "Sync adapter: calendar");
+    addDatabaseEntry("com.google.android.syncadapters.contacts", PackageCategory::DO_NOT_TOUCH, "Sync adapter: contacts");
+    addDatabaseEntry("com.google.android.youtube", PackageCategory::USER_APP, "YouTube");
+    addDatabaseEntry("com.heytap.browser", PackageCategory::SAFE_TO_REMOVE, "HeyTap browser");
+    addDatabaseEntry("com.heytap.community", PackageCategory::SAFE_TO_REMOVE, "HeyTap community");
+    addDatabaseEntry("com.heytap.market", PackageCategory::SAFE_TO_REMOVE, "HeyTap market");
+    addDatabaseEntry("com.heytap.themestore", PackageCategory::SAFE_TO_REMOVE, "HeyTap theme store");
+    addDatabaseEntry("com.hotstar.tv", PackageCategory::USER_APP, "Hotstar");
+    addDatabaseEntry("com.huawei.android.launcher", PackageCategory::OPTIONAL, "Huawei launcher");
+    addDatabaseEntry("com.huawei.calendar", PackageCategory::OPTIONAL, "Huawei calendar");
+    addDatabaseEntry("com.huawei.email", PackageCategory::OPTIONAL, "Huawei email");
+    addDatabaseEntry("com.huawei.gallery", PackageCategory::OPTIONAL, "Huawei gallery");
+    addDatabaseEntry("com.huawei.hwid", PackageCategory::OPTIONAL, "Huawei HWID");
+    addDatabaseEntry("com.huawei.music", PackageCategory::OPTIONAL, "Huawei music");
+    addDatabaseEntry("com.huawei.systemmanager", PackageCategory::DO_NOT_TOUCH, "Huawei system manager");
+    addDatabaseEntry("com.huawei.systemmetrics", PackageCategory::ANALYTICS, "Huawei system metrics");
+    addDatabaseEntry("com.instagram.android", PackageCategory::USER_APP, "Instagram");
+    addDatabaseEntry("com.jio.join", PackageCategory::USER_APP, "Jio Join");
+    addDatabaseEntry("com.jio.media.ondemand", PackageCategory::USER_APP, "Jio media");
+    addDatabaseEntry("com.jio.myjio", PackageCategory::USER_APP, "MyJio");
+    addDatabaseEntry("com.lge.diagnostics", PackageCategory::ANALYTICS, "LG diagnostics");
+    addDatabaseEntry("com.linkedin.android", PackageCategory::SAFE_TO_REMOVE, "LinkedIn");
+    addDatabaseEntry("com.mediatek.ims", PackageCategory::DO_NOT_TOUCH, "MediaTek IMS");
+    addDatabaseEntry("com.microsoft.office.excel", PackageCategory::USER_APP, "MS Excel");
+    addDatabaseEntry("com.microsoft.office.officehubrow", PackageCategory::SAFE_TO_REMOVE, "MS Office hub");
+    addDatabaseEntry("com.microsoft.office.word", PackageCategory::USER_APP, "MS Word");
+    addDatabaseEntry("com.microsoft.skydrive", PackageCategory::SAFE_TO_REMOVE, "MS SkyDrive");
+    addDatabaseEntry("com.microsoft.teams", PackageCategory::SAFE_TO_REMOVE, "MS Teams");
+    addDatabaseEntry("com.miui.analytics", PackageCategory::ANALYTICS, "MIUI analytics");
+    addDatabaseEntry("com.miui.android.fashiongallery", PackageCategory::SAFE_TO_REMOVE, "MIUI fashion gallery");
+    addDatabaseEntry("com.miui.bugreport", PackageCategory::SAFE_TO_REMOVE, "MIUI bugreport");
+    addDatabaseEntry("com.miui.calculator", PackageCategory::OPTIONAL, "MIUI calculator");
+    addDatabaseEntry("com.miui.cloudservice", PackageCategory::OPTIONAL, "MIUI cloud service");
+    addDatabaseEntry("com.miui.daemon", PackageCategory::OPTIONAL, "MIUI daemon");
+    addDatabaseEntry("com.miui.gallery", PackageCategory::OPTIONAL, "MIUI gallery");
+    addDatabaseEntry("com.miui.home", PackageCategory::OPTIONAL, "MIUI home");
+    addDatabaseEntry("com.miui.hybrid", PackageCategory::SAFE_TO_REMOVE, "MIUI hybrid");
+    addDatabaseEntry("com.miui.hybrid.accessory", PackageCategory::SAFE_TO_REMOVE, "MIUI hybrid accessory");
+    addDatabaseEntry("com.miui.msa.global", PackageCategory::ANALYTICS, "MIUI MSA global");
+    addDatabaseEntry("com.miui.notes", PackageCategory::OPTIONAL, "MIUI notes");
+    addDatabaseEntry("com.miui.player", PackageCategory::SAFE_TO_REMOVE, "MIUI player");
+    addDatabaseEntry("com.miui.powerkeeper", PackageCategory::DO_NOT_TOUCH, "MIUI powerkeeper");
+    addDatabaseEntry("com.miui.securitycenter", PackageCategory::DO_NOT_TOUCH, "MIUI security center");
+    addDatabaseEntry("com.miui.securitycore", PackageCategory::DO_NOT_TOUCH, "MIUI security core");
+    addDatabaseEntry("com.miui.videoplayer", PackageCategory::SAFE_TO_REMOVE, "MIUI videoplayer");
+    addDatabaseEntry("com.miui.weather2", PackageCategory::SAFE_TO_REMOVE, "MIUI weather");
+    addDatabaseEntry("com.miui.yellowpage", PackageCategory::SAFE_TO_REMOVE, "MIUI yellowpage");
+    addDatabaseEntry("com.motorola.moto.calculator", PackageCategory::OPTIONAL, "Motorola calculator");
+    addDatabaseEntry("com.motorola.moto.clock", PackageCategory::OPTIONAL, "Motorola clock");
+    addDatabaseEntry("com.mtk.system.receiver", PackageCategory::UNCATEGORIZED, "MTK system receiver");
+    addDatabaseEntry("com.myntra.android", PackageCategory::USER_APP, "Myntra");
+    addDatabaseEntry("com.netflix.mediaclient", PackageCategory::SAFE_TO_REMOVE, "Netflix");
+    addDatabaseEntry("com.netflix.partner.activation", PackageCategory::SAFE_TO_REMOVE, "Netflix partner activation");
+    addDatabaseEntry("com.netflix.watch", PackageCategory::USER_APP, "Netflix watch");
+    addDatabaseEntry("com.olacabs.customer", PackageCategory::USER_APP, "Ola");
+    addDatabaseEntry("com.oneplus.filemanager", PackageCategory::OPTIONAL, "OnePlus filemanager");
+    addDatabaseEntry("com.oneplus.gallery", PackageCategory::OPTIONAL, "OnePlus gallery");
+    addDatabaseEntry("com.oneplus.membership", PackageCategory::SAFE_TO_REMOVE, "OnePlus membership");
+    addDatabaseEntry("com.oneplus.store", PackageCategory::SAFE_TO_REMOVE, "OnePlus store");
+    addDatabaseEntry("com.opera.browser", PackageCategory::USER_APP, "Opera");
+    addDatabaseEntry("com.opera.preinstall", PackageCategory::SAFE_TO_REMOVE, "Opera preinstall");
+    addDatabaseEntry("com.oplus.onetrace", PackageCategory::ANALYTICS, "Oplus onetrace");
+    addDatabaseEntry("com.oplus.postmanservice", PackageCategory::UNCATEGORIZED, "Oplus postman service");
+    addDatabaseEntry("com.oplus.securitypermission", PackageCategory::DO_NOT_TOUCH, "Oplus security permission");
+    addDatabaseEntry("com.oplus.statistics.rom", PackageCategory::ANALYTICS, "Oplus statistics");
+    addDatabaseEntry("com.paypal.android.p2pmobile", PackageCategory::USER_APP, "PayPal");
+    addDatabaseEntry("com.phonepe.app", PackageCategory::USER_APP, "PhonePe");
+    addDatabaseEntry("com.primevideo", PackageCategory::USER_APP, "Prime Video");
+    addDatabaseEntry("com.qcril", PackageCategory::DO_NOT_TOUCH, "QCRIL");
+    addDatabaseEntry("com.qti", PackageCategory::DO_NOT_TOUCH, "QTI");
+    addDatabaseEntry("com.qti.qualcomm.deviceinfo", PackageCategory::DO_NOT_TOUCH, "Qualcomm device info");
+    addDatabaseEntry("com.qualcomm.location", PackageCategory::DO_NOT_TOUCH, "Qualcomm location");
+    addDatabaseEntry("com.qualcomm.qcrilmsgtunnel", PackageCategory::DO_NOT_TOUCH, "Qualcomm qcrilmsgtunnel");
+    addDatabaseEntry("com.qualcomm.qti", PackageCategory::DO_NOT_TOUCH, "Qualcomm qti");
+    addDatabaseEntry("com.qualcomm.qti.auth.fidocryptoservice", PackageCategory::UNCATEGORIZED, "Qualcomm fidocrypto");
+    addDatabaseEntry("com.qualcomm.timeservice", PackageCategory::DO_NOT_TOUCH, "Qualcomm timeservice");
+    addDatabaseEntry("com.realmestore.app", PackageCategory::SAFE_TO_REMOVE, "Realmestore");
+    addDatabaseEntry("com.reddit.frontpage", PackageCategory::USER_APP, "Reddit");
+    addDatabaseEntry("com.samsung.android.app.notes", PackageCategory::OPTIONAL, "Samsung Notes");
+    addDatabaseEntry("com.samsung.android.app.sbrowser", PackageCategory::OPTIONAL, "Samsung Browser");
+    addDatabaseEntry("com.samsung.android.app.spage", PackageCategory::SAFE_TO_REMOVE, "Samsung Spage");
+    addDatabaseEntry("com.samsung.android.app.tips", PackageCategory::SAFE_TO_REMOVE, "Samsung Tips");
+    addDatabaseEntry("com.samsung.android.aremoji", PackageCategory::SAFE_TO_REMOVE, "Samsung Aremoji");
+    addDatabaseEntry("com.samsung.android.arzone", PackageCategory::SAFE_TO_REMOVE, "Samsung Arzone");
+    addDatabaseEntry("com.samsung.android.brightnessbackupservice", PackageCategory::UNCATEGORIZED, "Samsung brightness backup");
+    addDatabaseEntry("com.samsung.android.calendar", PackageCategory::OPTIONAL, "Samsung calendar");
+    addDatabaseEntry("com.samsung.android.dialer", PackageCategory::DO_NOT_TOUCH, "Samsung dialer");
+    addDatabaseEntry("com.samsung.android.email.provider", PackageCategory::OPTIONAL, "Samsung email provider");
+    addDatabaseEntry("com.samsung.android.game.gamehome", PackageCategory::SAFE_TO_REMOVE, "Samsung Game Home");
+    addDatabaseEntry("com.samsung.android.game.gametools", PackageCategory::SAFE_TO_REMOVE, "Samsung Game Tools");
+    addDatabaseEntry("com.samsung.android.game.gos", PackageCategory::SAFE_TO_REMOVE, "Samsung Game Optimizing Service");
+    addDatabaseEntry("com.samsung.android.incallui", PackageCategory::DO_NOT_TOUCH, "Samsung incall UI");
+    addDatabaseEntry("com.samsung.android.messaging", PackageCategory::OPTIONAL, "Samsung messaging");
+    addDatabaseEntry("com.samsung.android.mobileservice", PackageCategory::DO_NOT_TOUCH, "Samsung mobile service");
+    addDatabaseEntry("com.samsung.android.networkstack", PackageCategory::DO_NOT_TOUCH, "Samsung network stack");
+    addDatabaseEntry("com.samsung.android.providers.contacts", PackageCategory::DO_NOT_TOUCH, "Samsung providers contacts");
+    addDatabaseEntry("com.samsung.android.securitylogagent", PackageCategory::ANALYTICS, "Samsung security log agent");
+    addDatabaseEntry("com.samsung.android.sm.policy", PackageCategory::UNCATEGORIZED, "Samsung SM policy");
+    addDatabaseEntry("com.samsung.android.stickercenter", PackageCategory::SAFE_TO_REMOVE, "Samsung sticker center");
+    addDatabaseEntry("com.samsung.android.themecenter", PackageCategory::SAFE_TO_REMOVE, "Samsung theme center");
+    addDatabaseEntry("com.samsung.android.themestore", PackageCategory::SAFE_TO_REMOVE, "Samsung theme store");
+    addDatabaseEntry("com.samsung.android.tvplus", PackageCategory::SAFE_TO_REMOVE, "Samsung TV Plus");
+    addDatabaseEntry("com.samsung.android.weather", PackageCategory::OPTIONAL, "Samsung weather");
+    addDatabaseEntry("com.sec.android.diagmonagent", PackageCategory::ANALYTICS, "Samsung diagmon agent");
+    addDatabaseEntry("com.sec.bcservice", PackageCategory::UNCATEGORIZED, "SEC BC service");
+    addDatabaseEntry("com.slack", PackageCategory::USER_APP, "Slack");
+    addDatabaseEntry("com.snapdeal.main", PackageCategory::USER_APP, "Snapdeal");
+    addDatabaseEntry("com.spotify.music", PackageCategory::USER_APP, "Spotify");
+    addDatabaseEntry("com.swiggy.android", PackageCategory::USER_APP, "Swiggy");
+    addDatabaseEntry("com.tencent.soter.soterserver", PackageCategory::SAFE_TO_REMOVE, "Tencent soter server");
+    addDatabaseEntry("com.tiktok.musically", PackageCategory::SAFE_TO_REMOVE, "TikTok (Musically)");
+    addDatabaseEntry("com.truecaller", PackageCategory::USER_APP, "Truecaller");
+    addDatabaseEntry("com.twitter.android", PackageCategory::USER_APP, "Twitter");
+    addDatabaseEntry("com.ubercab", PackageCategory::USER_APP, "Uber");
+    addDatabaseEntry("com.vivo.analytics", PackageCategory::ANALYTICS, "Vivo analytics");
+    addDatabaseEntry("com.vivo.appstore", PackageCategory::SAFE_TO_REMOVE, "Vivo appstore");
+    addDatabaseEntry("com.vivo.browser", PackageCategory::SAFE_TO_REMOVE, "Vivo browser");
+    addDatabaseEntry("com.vivo.daemonService", PackageCategory::UNCATEGORIZED, "Vivo daemon service");
+    addDatabaseEntry("com.vivo.easyshare", PackageCategory::SAFE_TO_REMOVE, "Vivo easyshare");
+    addDatabaseEntry("com.vivo.email", PackageCategory::OPTIONAL, "Vivo email");
+    addDatabaseEntry("com.vivo.gallery", PackageCategory::OPTIONAL, "Vivo gallery");
+    addDatabaseEntry("com.vivo.pem", PackageCategory::DO_NOT_TOUCH, "Vivo PEM");
+    addDatabaseEntry("com.whatsapp", PackageCategory::USER_APP, "WhatsApp");
+    addDatabaseEntry("com.whatsapp.w4b", PackageCategory::USER_APP, "WhatsApp Business");
+    addDatabaseEntry("com.x.android", PackageCategory::USER_APP, "X app");
+    addDatabaseEntry("com.xiaomi.bluetooth", PackageCategory::DO_NOT_TOUCH, "Xiaomi Bluetooth");
+    addDatabaseEntry("com.xiaomi.discover", PackageCategory::SAFE_TO_REMOVE, "Xiaomi Discover");
+    addDatabaseEntry("com.xiaomi.gamecenter", PackageCategory::SAFE_TO_REMOVE, "Xiaomi Game Center");
+    addDatabaseEntry("com.xiaomi.mipicks", PackageCategory::SAFE_TO_REMOVE, "Xiaomi MiPicks");
+    addDatabaseEntry("com.xiaomi.xmsf", PackageCategory::DO_NOT_TOUCH, "Xiaomi XMSF");
+    addDatabaseEntry("com.zhiliaoapp.musically", PackageCategory::SAFE_TO_REMOVE, "Zhiliao Musically");
+    addDatabaseEntry("com.zomato.android", PackageCategory::USER_APP, "Zomato");
+    addDatabaseEntry("in.org.npci.upiapp", PackageCategory::USER_APP, "NPCI UPI app");
+    addDatabaseEntry("net.one97.paytm", PackageCategory::USER_APP, "Paytm");
+    addDatabaseEntry("org.codeaurora.ims", PackageCategory::DO_NOT_TOUCH, "CodeAurora IMS");
+    addDatabaseEntry("org.mozilla.firefox", PackageCategory::USER_APP, "Firefox");
+    addDatabaseEntry("org.telegram.messenger", PackageCategory::USER_APP, "Telegram");
+    addDatabaseEntry("us.zoom.videomeetings", PackageCategory::USER_APP, "Zoom");
+
+    // === END GENERATED DATABASE ENTRIES ===
+
     // Core Android
     addCritical(
         "android",
@@ -359,30 +639,20 @@ PackageClassification PackageClassifier::Classify(const Package& package)
         "advert"
     }))
     {
-        if (package.type != PackageType::USER)
-        {
-            SetAnalytics(
-                result,
-                "Analytics or tracking package",
-                "Collects usage data, telemetry, or advertising information",
-                92);
-
-            return result;
-        }
-    }
-
-    // ===== USER INSTALLED =====
-
-    if (package.type == PackageType::USER)
-    {
-        result.category = PackageCategory::USER_APP;
-        result.reason = "User-installed application";
-        result.description = "Installed by the user and safe to remove";
-        result.safetyScore = 90;
-        result.canBeDisabled = true;
+        SetAnalytics(
+            result,
+            "Analytics or tracking package",
+            "Collects usage data, telemetry, or advertising information",
+            92);
 
         return result;
     }
+
+    // ===== USER INSTALLED =====
+    // NOTE: We intentionally do not return immediately for user-installed
+    // packages here so that pattern/database-driven rules (popular apps,
+    // analytics, optional utilities, or explicit database entries) can
+    // override the default USER_APP classification.
 
     // ===== POPULAR USER APPS =====
 
@@ -427,6 +697,19 @@ PackageClassification PackageClassifier::Classify(const Package& package)
             "Optional utility app",
             "Useful app but not required for Android to function",
             80);
+
+        return result;
+    }
+
+    // After checking patterns and explicit database matches above, use
+    // a fallback classification for user-installed apps.
+    if (package.type == PackageType::USER)
+    {
+        result.category = PackageCategory::USER_APP;
+        result.reason = "User-installed application";
+        result.description = "Installed by the user and safe to remove";
+        result.safetyScore = 90;
+        result.canBeDisabled = true;
 
         return result;
     }
@@ -610,7 +893,7 @@ std::string PackageClassifier::GetCategoryName(PackageCategory category)
         return "User";
     case PackageCategory::UNCATEGORIZED:
     default:
-        return "Other";
+        return "Unknown";
     }
 }
 

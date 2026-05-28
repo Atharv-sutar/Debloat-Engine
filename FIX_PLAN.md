@@ -1,4 +1,4 @@
-# New Plan  25-05-2026
+# New Plan  25-05-2026 
 ## planning to make the engine scalable.
 ## instead of only using hardcoded packages, use an additional AI model that classifies the packages
 ## hardcoded logic will be used for critical package checking, making sure some important packages are not flagged as removable
