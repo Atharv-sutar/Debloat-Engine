@@ -181,7 +181,7 @@ void PackageClassifier::BuildDatabase()
     addDatabaseEntry("com.android.captiveportallogin", PackageCategory::DO_NOT_TOUCH, "Captive portal login");
     addDatabaseEntry("com.android.carrierconfig", PackageCategory::DO_NOT_TOUCH, "Carrier config");
     addDatabaseEntry("com.android.cellbroadcastreceiver", PackageCategory::DO_NOT_TOUCH, "Cell broadcast receiver");
-    addDatabaseEntry("com.android.contacts", PackageCategory::OPTIONAL, "Contacts");
+    addDatabaseEntry("com.android.contacts", PackageCategory::DO_NOT_TOUCH, "Contacts");
     addDatabaseEntry("com.android.deskclock", PackageCategory::OPTIONAL, "Desk clock");
     addDatabaseEntry("com.android.documentsui", PackageCategory::DO_NOT_TOUCH, "Documents UI");
     addDatabaseEntry("com.android.egg", PackageCategory::UNCATEGORIZED, "Easter egg/unknown");
@@ -248,7 +248,7 @@ void PackageClassifier::BuildDatabase()
     addDatabaseEntry("com.google.android.apps.youtube.music", PackageCategory::USER_APP, "YouTube Music");
     addDatabaseEntry("com.google.android.configupdater", PackageCategory::DO_NOT_TOUCH, "Config updater");
     addDatabaseEntry("com.google.android.contacts", PackageCategory::DO_NOT_TOUCH, "Google Contacts");
-    addDatabaseEntry("com.google.android.dialer", PackageCategory::OPTIONAL, "Google Dialer");
+    addDatabaseEntry("com.google.android.dialer", PackageCategory::DO_NOT_TOUCH, "Google Dialer");
     addDatabaseEntry("com.google.android.ext.services", PackageCategory::DO_NOT_TOUCH, "Google ext services");
     addDatabaseEntry("com.google.android.ext.shared", PackageCategory::DO_NOT_TOUCH, "Google ext shared");
     addDatabaseEntry("com.google.android.feedback", PackageCategory::ANALYTICS, "Google feedback/analytics");
@@ -323,7 +323,7 @@ void PackageClassifier::BuildDatabase()
     addDatabaseEntry("com.opera.browser", PackageCategory::USER_APP, "Opera");
     addDatabaseEntry("com.opera.preinstall", PackageCategory::SAFE_TO_REMOVE, "Opera preinstall");
     addDatabaseEntry("com.oplus.onetrace", PackageCategory::ANALYTICS, "Oplus onetrace");
-    addDatabaseEntry("com.oplus.postmanservice", PackageCategory::UNCATEGORIZED, "Oplus postman service");
+    addDatabaseEntry("com.oplus.postmanservice", PackageCategory::SAFE_TO_REMOVE, "Oplus postman service");
     addDatabaseEntry("com.oplus.securitypermission", PackageCategory::DO_NOT_TOUCH, "Oplus security permission");
     addDatabaseEntry("com.oplus.statistics.rom", PackageCategory::ANALYTICS, "Oplus statistics");
     addDatabaseEntry("com.paypal.android.p2pmobile", PackageCategory::USER_APP, "PayPal");
@@ -339,8 +339,8 @@ void PackageClassifier::BuildDatabase()
     addDatabaseEntry("com.qualcomm.timeservice", PackageCategory::DO_NOT_TOUCH, "Qualcomm timeservice");
     addDatabaseEntry("com.realmestore.app", PackageCategory::SAFE_TO_REMOVE, "Realmestore");
     addDatabaseEntry("com.reddit.frontpage", PackageCategory::USER_APP, "Reddit");
-    addDatabaseEntry("com.samsung.android.app.notes", PackageCategory::OPTIONAL, "Samsung Notes");
-    addDatabaseEntry("com.samsung.android.app.sbrowser", PackageCategory::OPTIONAL, "Samsung Browser");
+    addDatabaseEntry("com.samsung.android.app.notes", PackageCategory::DO_NOT_TOUCH, "Samsung Notes");
+    addDatabaseEntry("com.samsung.android.app.sbrowser", PackageCategory::DO_NOT_TOUCH, "Samsung Browser");
     addDatabaseEntry("com.samsung.android.app.spage", PackageCategory::SAFE_TO_REMOVE, "Samsung Spage");
     addDatabaseEntry("com.samsung.android.app.tips", PackageCategory::SAFE_TO_REMOVE, "Samsung Tips");
     addDatabaseEntry("com.samsung.android.aremoji", PackageCategory::SAFE_TO_REMOVE, "Samsung Aremoji");
@@ -399,6 +399,36 @@ void PackageClassifier::BuildDatabase()
     addDatabaseEntry("org.mozilla.firefox", PackageCategory::USER_APP, "Firefox");
     addDatabaseEntry("org.telegram.messenger", PackageCategory::USER_APP, "Telegram");
     addDatabaseEntry("us.zoom.videomeetings", PackageCategory::USER_APP, "Zoom");
+    addDatabaseEntry("com.android.stk", PackageCategory::DO_NOT_TOUCH, "SIM Toolkit");
+    addDatabaseEntry("com.android.managedprovisioning", PackageCategory::DO_NOT_TOUCH, "Managed provisioning");
+    addDatabaseEntry("com.android.se", PackageCategory::DO_NOT_TOUCH, "Secure element");
+    addDatabaseEntry("com.android.wallpaperbackup", PackageCategory::OPTIONAL, "Wallpaper backup");
+    addDatabaseEntry("com.android.emergency", PackageCategory::DO_NOT_TOUCH, "Emergency information");
+    addDatabaseEntry("com.android.calllogbackup", PackageCategory::OPTIONAL, "Call log backup");
+    addDatabaseEntry("com.android.wallpapercropper", PackageCategory::OPTIONAL, "Wallpaper cropper");
+    addDatabaseEntry("com.google.android.marvin.talkback", PackageCategory::OPTIONAL, "TalkBack accessibility");
+    addDatabaseEntry("com.google.android.tts", PackageCategory::OPTIONAL, "Google Text-to-Speech");
+    addDatabaseEntry("com.google.android.calendar", PackageCategory::OPTIONAL, "Google Calendar");
+    addDatabaseEntry("com.google.android.keep", PackageCategory::OPTIONAL, "Google Keep");
+    addDatabaseEntry("com.google.android.apps.docs.editors.sheets", PackageCategory::USER_APP, "Google Sheets");
+    addDatabaseEntry("com.google.android.apps.docs.editors.slides", PackageCategory::USER_APP, "Google Slides");
+    addDatabaseEntry("com.google.android.apps.tachyon", PackageCategory::OPTIONAL, "Google Meet");
+    addDatabaseEntry("com.google.android.apps.magazines", PackageCategory::SAFE_TO_REMOVE, "Google News");
+    addDatabaseEntry("com.google.android.music", PackageCategory::SAFE_TO_REMOVE, "Google Play Music");
+    addDatabaseEntry("com.google.ar.lens", PackageCategory::OPTIONAL, "Google Lens");
+    addDatabaseEntry("com.google.android.apps.wellbeing", PackageCategory::OPTIONAL, "Digital Wellbeing");
+    addDatabaseEntry("com.google.android.projection.gearhead", PackageCategory::OPTIONAL, "Android Auto");
+    addDatabaseEntry("com.google.android.apps.subscriptions.red", PackageCategory::USER_APP, "YouTube Premium");
+    addDatabaseEntry("com.samsung.android.bixby.agent", PackageCategory::SAFE_TO_REMOVE, "Samsung Bixby Agent");
+    addDatabaseEntry("com.samsung.android.bixby.wakeup", PackageCategory::SAFE_TO_REMOVE, "Samsung Bixby Wakeup");
+    addDatabaseEntry("com.samsung.android.visionintelligence", PackageCategory::SAFE_TO_REMOVE, "Samsung Vision Intelligence");
+    addDatabaseEntry("com.miui.miwallpaper", PackageCategory::OPTIONAL, "MIUI wallpaper");
+    addDatabaseEntry("com.miui.screenrecorder", PackageCategory::OPTIONAL, "MIUI screen recorder");
+    addDatabaseEntry("com.oneplus.soundrecorder", PackageCategory::OPTIONAL, "OnePlus sound recorder");
+    addDatabaseEntry("com.oplus.games", PackageCategory::SAFE_TO_REMOVE, "Oplus Games");
+    addDatabaseEntry("com.vivo.weather", PackageCategory::OPTIONAL, "Vivo weather");
+    addDatabaseEntry("com.transsion.phonemaster", PackageCategory::SAFE_TO_REMOVE, "Phone Master");
+    addDatabaseEntry("com.transsion.magicshow", PackageCategory::SAFE_TO_REMOVE, "Transsion Magic Show");
 
     // === END GENERATED DATABASE ENTRIES ===
 
