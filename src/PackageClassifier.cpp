@@ -7,7 +7,7 @@
 #include <cctype>
 #include <regex>
 
-PackageClassifier::PackageClassifier(const std::string& deviceModel, OemType oemType)
+PackageClassifier::PackageClassifier(const std::string &deviceModel, OemType oemType)
     : deviceModel(deviceModel), currentOemType(oemType)
 {
     BuildDatabase();
@@ -16,7 +16,7 @@ PackageClassifier::PackageClassifier(const std::string& deviceModel, OemType oem
 /**
  * Convert string to lowercase for case-insensitive matching
  */
-static std::string ToLower(const std::string& str)
+static std::string ToLower(const std::string &str)
 {
     std::string result = str;
 
@@ -32,10 +32,10 @@ static std::string ToLower(const std::string& str)
 /**
  * Check if package matches any pattern
  */
-static bool MatchesAnyPattern(const std::string& packageName,
-                              const std::vector<std::string>& patterns)
+static bool MatchesAnyPattern(const std::string &packageName,
+                              const std::vector<std::string> &patterns)
 {
-    for (const auto& pattern : patterns)
+    for (const auto &pattern : patterns)
     {
         if (packageName.find(pattern) != std::string::npos)
         {
@@ -49,9 +49,9 @@ static bool MatchesAnyPattern(const std::string& packageName,
 /**
  * Helper for critical classifications
  */
-static void SetCritical(PackageClassification& result,
-                        const std::string& reason,
-                        const std::string& description)
+static void SetCritical(PackageClassification &result,
+                        const std::string &reason,
+                        const std::string &description)
 {
     result.category = PackageCategory::DO_NOT_TOUCH;
     result.reason = reason;
@@ -63,9 +63,9 @@ static void SetCritical(PackageClassification& result,
 /**
  * Helper for optional classifications
  */
-static void SetOptional(PackageClassification& result,
-                        const std::string& reason,
-                        const std::string& description,
+static void SetOptional(PackageClassification &result,
+                        const std::string &reason,
+                        const std::string &description,
                         int score = 75)
 {
     result.category = PackageCategory::OPTIONAL;
@@ -78,9 +78,9 @@ static void SetOptional(PackageClassification& result,
 /**
  * Helper for safe-to-remove classifications
  */
-static void SetSafe(PackageClassification& result,
-                    const std::string& reason,
-                    const std::string& description,
+static void SetSafe(PackageClassification &result,
+                    const std::string &reason,
+                    const std::string &description,
                     int score = 90)
 {
     result.category = PackageCategory::SAFE_TO_REMOVE;
@@ -90,9 +90,9 @@ static void SetSafe(PackageClassification& result,
     result.canBeDisabled = true;
 }
 
-static void SetAnalytics(PackageClassification& result,
-                         const std::string& reason,
-                         const std::string& description,
+static void SetAnalytics(PackageClassification &result,
+                         const std::string &reason,
+                         const std::string &description,
                          int score = 90)
 {
     result.category = PackageCategory::ANALYTICS;
@@ -107,9 +107,9 @@ void PackageClassifier::BuildDatabase()
     database.clear();
 
     auto addCritical =
-        [this](const std::string& pkg,
-               const std::string& reason,
-               const std::string& description)
+        [this](const std::string &pkg,
+               const std::string &reason,
+               const std::string &description)
     {
         PackageClassification item(pkg);
 
@@ -126,9 +126,9 @@ void PackageClassifier::BuildDatabase()
     // package mappings (from packages.md or other lists). Paste your
     // `addDatabaseEntry("com.example.pkg", PackageCategory::SAFE_TO_REMOVE, "desc");`
     // lines between the START/END markers below.
-    auto addDatabaseEntry = [this](const std::string& pkg,
+    auto addDatabaseEntry = [this](const std::string &pkg,
                                    PackageCategory cat,
-                                   const std::string& description)
+                                   const std::string &description)
     {
         PackageClassification item(pkg);
         item.category = cat;
@@ -481,7 +481,7 @@ void PackageClassifier::BuildDatabase()
     database["com.xiaomi.finddevice"] = findDevice;
 }
 
-PackageClassification PackageClassifier::Classify(const Package& package)
+PackageClassification PackageClassifier::Classify(const Package &package)
 {
     PackageClassification result(package.packageName);
 
@@ -501,7 +501,7 @@ PackageClassification PackageClassifier::Classify(const Package& package)
 
     // ===== EXACT DATABASE MATCH =====
 
-    const auto* dbEntry = GetDatabaseEntry(package.packageName);
+    const auto *dbEntry = GetDatabaseEntry(package.packageName);
 
     if (dbEntry)
     {
@@ -511,10 +511,8 @@ PackageClassification PackageClassifier::Classify(const Package& package)
     // ===== OVERLAY / RRO PROTECTION =====
 
     if (MatchesAnyPattern(pkgLower,
-    {
-        ".overlay",
-        ".rro"
-    }))
+                          {".overlay",
+                           ".rro"}))
     {
         SetCritical(
             result,
@@ -567,17 +565,15 @@ PackageClassification PackageClassifier::Classify(const Package& package)
     // ===== QUALCOMM / TELEPHONY / IMS PROTECTION =====
 
     if (MatchesAnyPattern(pkgLower,
-    {
-        "qti",
-        "qualcomm",
-        "qcril",
-        "ims",
-        "iwlan",
-        "uim",
-        "volte",
-        "telephony",
-        "carrier"
-    }))
+                          {"qti",
+                           "qualcomm",
+                           "qcril",
+                           "ims",
+                           "iwlan",
+                           "uim",
+                           "volte",
+                           "telephony",
+                           "carrier"}))
     {
         SetCritical(
             result,
@@ -591,14 +587,12 @@ PackageClassification PackageClassifier::Classify(const Package& package)
 
     // Protected Xiaomi packages
     if (MatchesAnyPattern(pkgLower,
-    {
-        "securitycenter",
-        "securitycore",
-        "powerkeeper",
-        "xmsf",
-        "miui.core",
-        "miui.system"
-    }))
+                          {"securitycenter",
+                           "securitycore",
+                           "powerkeeper",
+                           "xmsf",
+                           "miui.core",
+                           "miui.system"}))
     {
         SetCritical(
             result,
@@ -610,12 +604,10 @@ PackageClassification PackageClassifier::Classify(const Package& package)
 
     // Xiaomi cloud/account integrations -> OPTIONAL
     if (MatchesAnyPattern(pkgLower,
-    {
-        "finddevice",
-        "cloudservice",
-        "micloud",
-        "backup"
-    }))
+                          {"finddevice",
+                           "cloudservice",
+                           "micloud",
+                           "backup"}))
     {
         SetOptional(
             result,
@@ -628,19 +620,17 @@ PackageClassification PackageClassifier::Classify(const Package& package)
 
     // Xiaomi removable bloatware
     if (MatchesAnyPattern(pkgLower,
-    {
-        "msa",
-        "mipicks",
-        "analytics",
-        "hybrid",
-        "browser",
-        "videoplayer",
-        "music",
-        "joyose",
-        "weather",
-        "scanner",
-        "compass"
-    }))
+                          {"msa",
+                           "mipicks",
+                           "analytics",
+                           "hybrid",
+                           "browser",
+                           "videoplayer",
+                           "music",
+                           "joyose",
+                           "weather",
+                           "scanner",
+                           "compass"}))
     {
         SetSafe(
             result,
@@ -654,14 +644,12 @@ PackageClassification PackageClassifier::Classify(const Package& package)
     // ===== ANALYTICS / ADS =====
 
     if (MatchesAnyPattern(pkgLower,
-    {
-        "analytics",
-        "telemetry",
-        "tracker",
-        "ads",
-        "admob",
-        "advert"
-    }))
+                          {"analytics",
+                           "telemetry",
+                           "tracker",
+                           "ads",
+                           "admob",
+                           "advert"}))
     {
         SetAnalytics(
             result,
@@ -681,19 +669,17 @@ PackageClassification PackageClassifier::Classify(const Package& package)
     // ===== POPULAR USER APPS =====
 
     if (MatchesAnyPattern(pkgLower,
-    {
-        "facebook",
-        "instagram",
-        "spotify",
-        "netflix",
-        "whatsapp",
-        "telegram",
-        "snapchat",
-        "twitter",
-        "discord",
-        "reddit",
-        "youtube"
-    }))
+                          {"facebook",
+                           "instagram",
+                           "spotify",
+                           "netflix",
+                           "whatsapp",
+                           "telegram",
+                           "snapchat",
+                           "twitter",
+                           "discord",
+                           "reddit",
+                           "youtube"}))
     {
         SetOptional(
             result,
@@ -707,14 +693,12 @@ PackageClassification PackageClassifier::Classify(const Package& package)
     // ===== OPTIONAL UTILITIES =====
 
     if (MatchesAnyPattern(pkgLower,
-    {
-        "calculator",
-        "recorder",
-        "notes",
-        "gallery",
-        "compass",
-        "scanner"
-    }))
+                          {"calculator",
+                           "recorder",
+                           "notes",
+                           "gallery",
+                           "compass",
+                           "scanner"}))
     {
         SetOptional(
             result,
@@ -763,8 +747,8 @@ PackageClassification PackageClassifier::Classify(const Package& package)
     return result;
 }
 
-const PackageClassification*
-PackageClassifier::GetDatabaseEntry(const std::string& packageName) const
+const PackageClassification *
+PackageClassifier::GetDatabaseEntry(const std::string &packageName) const
 {
     auto it = database.find(packageName);
 
@@ -777,8 +761,8 @@ PackageClassifier::GetDatabaseEntry(const std::string& packageName) const
 }
 
 bool PackageClassifier::MatchesPattern(
-    const std::string& packageName,
-    const std::string& pattern)
+    const std::string &packageName,
+    const std::string &pattern)
 {
     std::string pat = pattern;
 
@@ -832,9 +816,9 @@ bool PackageClassifier::MatchesPattern(
     return p == pat.size() && n == packageName.size();
 }
 
-OemType PackageClassifier::DetectOemType(const std::string& manufacturer,
-                                         const std::string& product,
-                                         const std::string& buildBrand)
+OemType PackageClassifier::DetectOemType(const std::string &manufacturer,
+                                         const std::string &product,
+                                         const std::string &buildBrand)
 {
     std::string mfg = ToLower(manufacturer);
     std::string prod = ToLower(product);
@@ -923,7 +907,7 @@ std::string PackageClassifier::GetCategoryName(PackageCategory category)
 
 std::vector<PackageClassification>
 PackageClassifier::ClassifyMultiple(
-    const std::vector<Package>& packages,
+    const std::vector<Package> &packages,
     PackageCategory category)
 {
     std::vector<PackageClassification> result;
@@ -931,7 +915,7 @@ PackageClassifier::ClassifyMultiple(
     // Prevent duplicate package entries
     std::unordered_set<std::string> seen;
 
-    for (const auto& pkg : packages)
+    for (const auto &pkg : packages)
     {
         if (seen.count(pkg.packageName))
         {
@@ -942,8 +926,7 @@ PackageClassifier::ClassifyMultiple(
 
         auto classified = Classify(pkg);
 
-        if (category == PackageCategory::UNCATEGORIZED ||
-            classified.category == category)
+        if (classified.category == category)
         {
             result.push_back(classified);
         }
