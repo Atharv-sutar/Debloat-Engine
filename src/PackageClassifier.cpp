@@ -524,6 +524,30 @@ PackageClassification PackageClassifier::Classify(const Package& package)
         return result;
     }
 
+    // ===== PACKAGE.H KNOWN ANALYTICS / BLOATWARE =====
+
+    if (package.IsAnalytics())
+    {
+        SetAnalytics(
+            result,
+            "Analytics or tracking package",
+            "Collects usage, telemetry, or advertising information",
+            92);
+
+        return result;
+    }
+
+    if (package.IsKnownBloatware())
+    {
+        SetSafe(
+            result,
+            "Known bloatware package",
+            "Preinstalled or partner app that is usually safe to remove",
+            88);
+
+        return result;
+    }
+
     // ===== ANDROID FRAMEWORK / PROVIDER PROTECTION =====
 
     if (pkgLower.find("com.android.providers.") == 0 ||

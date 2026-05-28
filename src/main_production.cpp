@@ -52,8 +52,9 @@ void PrintMenu()
     std::cout << "5. Exit\n";
     std::cout << "6. Refresh Scan\n";
     std::cout << "7. Switch Device\n";
+    std::cout << "8. Search Packages\n";
     std::cout << "==============================================\n";
-    std::cout << "\nEnter choice (1-7): ";
+    std::cout << "\nEnter choice (1-8): ";
 }
 
 void PrintCategoryMenu()
@@ -66,7 +67,7 @@ void PrintCategoryMenu()
     std::cout << "3. Analytics (Tracking/telemetry)\n";
     std::cout << "4. Optional (User's choice)\n";
     std::cout << "5. User (User-installed apps)\n";
-    std::cout << "6. Other (Unknown packages)\n";
+    std::cout << "6. Unknown (Unknown packages)\n";
     std::cout << "7. All Packages\n";
     std::cout << "8. Back to main menu\n";
     std::cout << "==============================================\n";
@@ -522,7 +523,7 @@ int main()
                 else if (catChoice == "6")
                 {
                     categoryPackages = classifier.ClassifyMultiple(allPkgs, PackageCategory::UNCATEGORIZED);
-                    categoryName = "Other";
+                    categoryName = "Unknown";
                 }
                 else if (catChoice == "7")
                 {
@@ -886,6 +887,70 @@ int main()
                 else
                 {
                     std::cout << "[ERROR] Failed to fetch packages for new device!\n";
+                    std::cout << "Press Enter to continue...";
+                    std::getline(std::cin, choice);
+                }
+            }
+            
+            ClearScreen();
+            PrintHeader();
+        }
+        else if (choice == "8")
+        {
+            ClearScreen();
+            PrintHeader();
+            
+            std::cout << "Enter search query (package name or partial name): ";
+            std::string query;
+            std::getline(std::cin, query);
+            
+            if (query.empty())
+            {
+                std::cout << "[INFO] Search query cannot be empty.\n";
+                std::cout << "Press Enter to continue...";
+                std::getline(std::cin, choice);
+            }
+            else
+            {
+                std::vector<Package> searchResults = pkgMgr.SearchPackages(query);
+                
+                if (searchResults.empty())
+                {
+                    std::cout << "[INFO] No packages found matching: " << query << "\n";
+                    std::cout << "Press Enter to continue...";
+                    std::getline(std::cin, choice);
+                }
+                else
+                {
+                    std::vector<PackageClassification> classifiedResults;
+                    size_t displayCount = std::min(static_cast<size_t>(200), searchResults.size());
+                    
+                    for (size_t i = 0; i < displayCount; ++i)
+                    {
+                        classifiedResults.push_back(classifier.Classify(searchResults[i]));
+                    }
+                    
+                    ClearScreen();
+                    PrintHeader();
+                    std::cout << "Search Results for: " << query << " (" << displayCount << " of " << searchResults.size() << ")\n\n";
+                    std::cout << std::string(100, '=') << "\n";
+                    std::cout << "[#]   Package Name                           | Category        | Safety\n";
+                    std::cout << std::string(100, '-') << "\n";
+                    
+                    for (size_t i = 0; i < classifiedResults.size(); ++i)
+                    {
+                        std::string shortName = classifiedResults[i].packageName;
+                        if (shortName.length() > 35)
+                            shortName = shortName.substr(0, 32) + "...";
+                        
+                        printf("[%-3zu] %-35s | %-15s | %3d%%\n",
+                               i + 1,
+                               shortName.c_str(),
+                               PackageClassifier::GetCategoryName(classifiedResults[i].category).c_str(),
+                               classifiedResults[i].safetyScore);
+                    }
+                    
+                    std::cout << std::string(100, '=') << "\n";
                     std::cout << "Press Enter to continue...";
                     std::getline(std::cin, choice);
                 }
