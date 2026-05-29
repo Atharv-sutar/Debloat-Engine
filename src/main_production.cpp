@@ -53,8 +53,9 @@ void PrintMenu()
     std::cout << "6. Refresh Scan\n";
     std::cout << "7. Switch Device\n";
     std::cout << "8. Search Packages\n";
+    std::cout << "9. Restore Disabled Packages\n";
     std::cout << "==============================================\n";
-    std::cout << "\nEnter choice (1-8): ";
+    std::cout << "\nEnter choice (1-9): ";
 }
 
 void PrintCategoryMenu()
@@ -86,20 +87,22 @@ void DisplayPackagesWithCheckboxes(const std::vector<PackageClassification>& pac
     std::cout << "\n" << std::string(100, '=') << "\n";
     std::cout << "Packages (" << packages.size() << " total)\n";
     std::cout << std::string(100, '=') << "\n";
-    std::cout << "[#]   [Sel]  Package Name                           | Type  | Category\n";
+    std::cout << "[#]   [Sel]  Package Name                           | Type  | Status   | Category\n";
     std::cout << std::string(100, '-') << "\n";
 
     for (size_t i = 0; i < packages.size(); ++i)
     {
         bool isSelected = selected.count(packages[i].packageName) > 0;
-        std::string checkbox = isSelected ? "[X]" : "[ ]"; // erro, it prints ΓÿÉ instead of checkboxes, maybe console doesn't support unicode so
+        std::string checkbox = isSelected ? "[X]" : "[ ]";
         std::string typeStr = (packages[i].canBeDisabled) ? "USR" : "SYS";
+        std::string statusStr = packages[i].isEnabled ? "ENABLED" : "DISABLED";
         std::string shortName = packages[i].packageName;
         if (shortName.length() > 35)
             shortName = shortName.substr(0, 32) + "...";
 
-        printf("[%-3zu] %s  %-35s | %5s | %s\n",
+        printf("[%-3zu] %s  %-35s | %5s | %-8s | %s\n",
                i + 1, checkbox.c_str(), shortName.c_str(), typeStr.c_str(),
+               statusStr.c_str(),
                PackageClassifier::GetCategoryName(packages[i].category).c_str());
     }
 
@@ -640,9 +643,11 @@ int main()
             std::cout << std::string(60, '-') << "\n";
             for (size_t i = 0; i < removalCandidates.size(); ++i)
             {
+                std::string statusStr = removalCandidates[i].isEnabled ? "ENABLED" : "DISABLED";
                 std::cout << std::setw(3) << (i + 1) << ". "
-                          << std::setw(45) << removalCandidates[i].packageName
-                          << " [" << PackageClassifier::GetCategoryName(removalCandidates[i].category) << "]\n";
+                          << std::setw(40) << removalCandidates[i].packageName
+                          << " [" << PackageClassifier::GetCategoryName(removalCandidates[i].category) << "]"
+                          << " (" << statusStr << ")\n";
             }
             std::cout << std::string(60, '-') << "\n";
             std::cout << "1. Remove all packages (" << removalCandidates.size() << ")\n";
@@ -719,7 +724,53 @@ int main()
                 continue;
             }
 
-            std::cout << "\n[CONFIRM] Remove the following packages?\n";
+            std::cout << "\n[REMOVAL MODE]\n";
+            std::cout << "1. Disable selected packages (safe rollback)\n";
+            std::cout << "2. Uninstall selected packages (permanent)\n";
+            std::cout << "3. Uninstall if possible, otherwise disable\n";
+            std::cout << "4. Cancel\n";
+            std::cout << "Enter choice (1-4): ";
+
+            std::string actionChoice;
+            std::getline(std::cin, actionChoice);
+
+            RemovalAction chosenAction = RemovalAction::UNINSTALL_OR_DISABLE;
+            if (actionChoice == "1")
+            {
+                chosenAction = RemovalAction::DISABLE;
+            }
+            else if (actionChoice == "2")
+            {
+                chosenAction = RemovalAction::UNINSTALL;
+            }
+            else if (actionChoice == "3")
+            {
+                chosenAction = RemovalAction::UNINSTALL_OR_DISABLE;
+            }
+            else
+            {
+                std::cout << "\n[INFO] Removal cancelled.\n";
+                std::cout << "Press Enter to continue...";
+                std::getline(std::cin, choice);
+                ClearScreen();
+                PrintHeader();
+                continue;
+            }
+
+            std::cout << "\n[CONFIRM] ";
+            if (chosenAction == RemovalAction::DISABLE)
+            {
+                std::cout << "Disable the following packages?\n";
+            }
+            else if (chosenAction == RemovalAction::UNINSTALL)
+            {
+                std::cout << "Uninstall the following packages?\n";
+            }
+            else
+            {
+                std::cout << "Uninstall or disable the following packages?\n";
+            }
+
             for (const auto& pkg : selectedForRemoval)
             {
                 std::cout << "  - " << pkg.packageName << "\n";
@@ -736,12 +787,21 @@ int main()
                 std::cout << "\n[PROCESSING]\n";
                 for (const auto& pkg : selectedForRemoval)
                 {
-                    auto result = engine.RemovePackage(pkg.packageName, RemovalAction::UNINSTALL_OR_DISABLE);
+                    auto result = engine.RemovePackage(pkg.packageName, chosenAction);
                     if (result.status == RemovalStatus::SUCCESS)
                     {
-                        std::cout << "  [+] " << pkg.packageName << "\n";
+                        std::cout << "  [+] " << pkg.packageName << " (";
+                        if (result.action == RemovalAction::DISABLE)
+                        {
+                            std::cout << "disabled";
+                        }
+                        else
+                        {
+                            std::cout << "uninstalled";
+                        }
+                        std::cout << ")\n";
                         success++;
-                        logger.RemovalLog(pkg.packageName, "REMOVED", true);
+                        logger.RemovalLog(pkg.packageName, result.action == RemovalAction::DISABLE ? "DISABLED" : "REMOVED", true);
                         selectedPackages.erase(pkg.packageName);
                     }
                     else
@@ -788,6 +848,8 @@ int main()
             std::cout << "Total Packages: " << allPkgs.size() << "\n";
             std::cout << "  - System: " << pkgMgr.GetSystemPackageCount() << "\n";
             std::cout << "  - User: " << pkgMgr.GetUserPackageCount() << "\n";
+            std::cout << "  - Enabled: " << pkgMgr.GetEnabledPackageCount() << "\n";
+            std::cout << "  - Disabled: " << pkgMgr.GetDisabledPackageCount() << "\n";
             std::cout << "\nCATEGORY BREAKDOWN\n";
             std::cout << std::string(60, '-') << "\n";
             std::cout << "Protected (Do Not Remove):   " << std::setw(4) << protectedPkgs.size() << " packages\n";
@@ -934,7 +996,7 @@ int main()
                     PrintHeader();
                     std::cout << "Search Results for: " << query << " (" << displayCount << " of " << searchResults.size() << ")\n\n";
                     std::cout << std::string(100, '=') << "\n";
-                    std::cout << "[#]   Package Name                           | Category        | Safety\n";
+                    std::cout << "[#]   Package Name                           | Category        | Safety | Status\n";
                     std::cout << std::string(100, '-') << "\n";
                     
                     for (size_t i = 0; i < classifiedResults.size(); ++i)
@@ -942,12 +1004,14 @@ int main()
                         std::string shortName = classifiedResults[i].packageName;
                         if (shortName.length() > 35)
                             shortName = shortName.substr(0, 32) + "...";
+                        std::string statusStr = classifiedResults[i].isEnabled ? "ENABLED" : "DISABLED";
                         
-                        printf("[%-3zu] %-35s | %-15s | %3d%%\n",
+                        printf("[%-3zu] %-35s | %-15s | %3d%% | %-8s\n",
                                i + 1,
                                shortName.c_str(),
                                PackageClassifier::GetCategoryName(classifiedResults[i].category).c_str(),
-                               classifiedResults[i].safetyScore);
+                               classifiedResults[i].safetyScore,
+                               statusStr.c_str());
                     }
                     
                     std::cout << std::string(100, '=') << "\n";
@@ -956,6 +1020,89 @@ int main()
                 }
             }
             
+            ClearScreen();
+            PrintHeader();
+        }
+        else if (choice == "9")
+        {
+            ClearScreen();
+            PrintHeader();
+
+            auto disabledPkgs = pkgMgr.GetDisabledPackages();
+            if (disabledPkgs.empty())
+            {
+                std::cout << "[INFO] No disabled packages detected on this device.\n";
+                std::cout << "Press Enter to continue...";
+                std::getline(std::cin, choice);
+                ClearScreen();
+                PrintHeader();
+                continue;
+            }
+
+            std::vector<PackageClassification> disabledClassified;
+            for (const auto& pkg : disabledPkgs)
+            {
+                disabledClassified.push_back(classifier.Classify(pkg));
+            }
+
+            std::set<std::string> restoreSelection;
+            ClearScreen();
+            PrintHeader();
+            std::cout << "Select disabled packages to restore. Press 'd' when done.\n\n";
+            ManagePackageSelection(disabledClassified, restoreSelection, true);
+
+            if (restoreSelection.empty())
+            {
+                std::cout << "[INFO] No disabled packages selected.\n";
+                std::cout << "Press Enter to continue...";
+                std::getline(std::cin, choice);
+                ClearScreen();
+                PrintHeader();
+                continue;
+            }
+
+            std::cout << "\n[CONFIRM] Re-enable the following packages?\n";
+            for (const auto& pkg : restoreSelection)
+            {
+                std::cout << "  - " << pkg << "\n";
+            }
+            std::cout << "Type 'yes' to proceed: ";
+            std::string confirm;
+            std::getline(std::cin, confirm);
+
+            if (confirm == "yes")
+            {
+                RemovalEngine engine(targetDevice);
+                int success = 0, failed = 0;
+
+                std::cout << "\n[PROCESSING]\n";
+                for (const auto& packageName : restoreSelection)
+                {
+                    auto result = engine.EnablePackage(packageName);
+                    if (result.status == RemovalStatus::SUCCESS)
+                    {
+                        std::cout << "  [+] " << packageName << " enabled\n";
+                        success++;
+                    }
+                    else
+                    {
+                        std::cout << "  [-] " << packageName << " failed: " << result.message << "\n";
+                        failed++;
+                    }
+                }
+
+                std::cout << "\n[RESULT] " << success << " restored, " << failed << " failed\n";
+                if (success > 0)
+                {
+                    pkgMgr.FetchAllPackages();
+                    allPkgs = pkgMgr.GetAllPackages();
+                    safeToRemoveList = classifier.ClassifyMultiple(allPkgs, PackageCategory::SAFE_TO_REMOVE);
+                    optionalList = classifier.ClassifyMultiple(allPkgs, PackageCategory::OPTIONAL);
+                }
+                std::cout << "Press Enter to continue...";
+                std::getline(std::cin, confirm);
+            }
+
             ClearScreen();
             PrintHeader();
         }

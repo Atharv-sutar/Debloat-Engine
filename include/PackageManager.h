@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <unordered_set>
 
 /**
  * PackageManager - Manages Android package operations
@@ -103,6 +104,30 @@ public:
     std::vector<Package> GetAnalyticsPackages() const;
 
     /**
+     * Get disabled packages
+     * @return Vector of disabled packages
+     */
+    std::vector<Package> GetDisabledPackages() const;
+
+    /**
+     * Get enabled packages
+     * @return Vector of enabled packages
+     */
+    std::vector<Package> GetEnabledPackages() const;
+
+    /**
+     * Get disabled package count
+     * @return Number of disabled packages
+     */
+    size_t GetDisabledPackageCount() const;
+
+    /**
+     * Get enabled package count
+     * @return Number of enabled packages
+     */
+    size_t GetEnabledPackageCount() const;
+
+    /**
      * Search packages by name (substring match, case-insensitive)
      * @param query Search query
      * @return Vector of matching packages
@@ -157,6 +182,12 @@ private:
      * @return Vector of parsed Package objects
      */
     std::vector<Package> ParsePackageList(const std::string& output, PackageType type);
+
+    /**
+     * Get currently disabled package names from the device
+     * @return Set of disabled package names
+     */
+    std::unordered_set<std::string> GetDisabledPackageSet() const;
 
     /**
      * Extract version code from dumpsys output

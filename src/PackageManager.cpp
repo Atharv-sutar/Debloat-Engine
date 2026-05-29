@@ -32,13 +32,16 @@ bool PackageManager::FetchAllPackages()
         return false;
     }
 
+    std::unordered_set<std::string> disabledPackages = GetDisabledPackageSet();
+
     // Deduplicate any packages that may have been returned by both queries.
     std::unordered_set<std::string> seen;
     std::vector<Package> uniquePackages;
     uniquePackages.reserve(allPackages.size());
 
-    for (const auto& pkg : allPackages)
+    for (auto& pkg : allPackages)
     {
+        pkg.isEnabled = (disabledPackages.count(pkg.packageName) == 0);
         if (seen.insert(pkg.packageName).second)
         {
             uniquePackages.push_back(pkg);
@@ -158,6 +161,35 @@ std::vector<Package> PackageManager::ParsePackageList(const std::string& output,
     return packages;
 }
 
+std::unordered_set<std::string> PackageManager::GetDisabledPackageSet() const
+{
+    std::unordered_set<std::string> result;
+    AdbManager& adb = AdbManager::GetInstance();
+    std::string command = adb.GetAdbPath() + " -s " + deviceSerial + " shell pm list packages -d";
+    std::string output;
+
+    if (!CommandExecutor::Execute(command, output))
+    {
+        return result;
+    }
+
+    auto lines = CommandExecutor::SplitLines(output);
+    for (auto line : lines)
+    {
+        if (line.find("package:") == 0)
+        {
+            line = line.substr(8);
+        }
+
+        if (!line.empty())
+        {
+            result.insert(line);
+        }
+    }
+
+    return result;
+}
+
 std::vector<Package> PackageManager::GetSystemPackages() const
 {
     std::vector<Package> result;
@@ -231,6 +263,42 @@ std::vector<Package> PackageManager::GetAnalyticsPackages() const
         }
     }
     return result;
+}
+
+std::vector<Package> PackageManager::GetDisabledPackages() const
+{
+    std::vector<Package> result;
+    for (const auto& pkg : allPackages)
+    {
+        if (!pkg.isEnabled)
+        {
+            result.push_back(pkg);
+        }
+    }
+    return result;
+}
+
+std::vector<Package> PackageManager::GetEnabledPackages() const
+{
+    std::vector<Package> result;
+    for (const auto& pkg : allPackages)
+    {
+        if (pkg.isEnabled)
+        {
+            result.push_back(pkg);
+        }
+    }
+    return result;
+}
+
+size_t PackageManager::GetDisabledPackageCount() const
+{
+    return GetDisabledPackages().size();
+}
+
+size_t PackageManager::GetEnabledPackageCount() const
+{
+    return GetEnabledPackages().size();
 }
 
 std::vector<Package> PackageManager::SearchPackages(const std::string& query) const

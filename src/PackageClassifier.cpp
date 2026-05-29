@@ -514,6 +514,7 @@ void PackageClassifier::BuildDatabase()
 PackageClassification PackageClassifier::Classify(const Package &package)
 {
     PackageClassification result(package.packageName);
+    result.isEnabled = package.isEnabled;
 
     const std::string pkgLower = ToLower(package.packageName);
 
@@ -535,7 +536,9 @@ PackageClassification PackageClassifier::Classify(const Package &package)
 
     if (dbEntry)
     {
-        return *dbEntry;
+        PackageClassification copy = *dbEntry;
+        copy.isEnabled = package.isEnabled;
+        return copy;
     }
 
     // ===== OVERLAY / RRO PROTECTION =====
@@ -648,24 +651,25 @@ PackageClassification PackageClassifier::Classify(const Package &package)
         return result;
     }
 
-    // Xiaomi removable bloatware
+    // Xiaomi removable bloatware - only known, non-essential packages
     if (MatchesAnyPattern(pkgLower,
-                          {"msa",
-                           "mipicks",
-                           "analytics",
-                           "hybrid",
-                           "browser",
-                           "videoplayer",
-                           "music",
-                           "joyose",
-                           "weather",
-                           "scanner",
-                           "compass"}))
+                          {"com.miui.msa.global",
+                           "com.miui.hybrid",
+                           "com.miui.hybrid.accessory",
+                           "com.miui.player",
+                           "com.miui.videoplayer",
+                           "com.miui.weather2",
+                           "com.miui.yellowpage",
+                           "com.miui.android.fashiongallery",
+                           "com.xiaomi.discover",
+                           "com.xiaomi.mipicks",
+                           "com.xiaomi.gamecenter",
+                           "com.miui.bugreport"}))
     {
         SetSafe(
             result,
-            "Preinstalled Xiaomi app",
-            "Optional Xiaomi app that can usually be removed safely",
+            "Known Xiaomi removable app",
+            "Preinstalled Xiaomi package that is generally safe to remove",
             88);
 
         return result;
@@ -695,30 +699,6 @@ PackageClassification PackageClassifier::Classify(const Package &package)
     // packages here so that pattern/database-driven rules (popular apps,
     // analytics, optional utilities, or explicit database entries) can
     // override the default USER_APP classification.
-
-    // ===== POPULAR USER APPS =====
-
-    if (MatchesAnyPattern(pkgLower,
-                          {"facebook",
-                           "instagram",
-                           "spotify",
-                           "netflix",
-                           "whatsapp",
-                           "telegram",
-                           "snapchat",
-                           "twitter",
-                           "discord",
-                           "reddit",
-                           "youtube"}))
-    {
-        SetOptional(
-            result,
-            "Popular app",
-            "You can remove this app if you do not use it",
-            95);
-
-        return result;
-    }
 
     // ===== OPTIONAL UTILITIES =====
 

@@ -51,18 +51,19 @@ struct PackageClassification
     OemType oemApplicability;        // Which OEM uses this
     bool canBeDisabled;              // Can be disabled instead of removed
     int safetyScore;                 // 0-100 (higher = safer to remove)
+    bool isEnabled;                  // Whether the package is currently enabled on device
 
     PackageClassification()
         : packageName(""), category(PackageCategory::UNCATEGORIZED),
           reason(""), description(""), isOemSpecific(false),
           oemApplicability(OemType::UNKNOWN), canBeDisabled(true),
-          safetyScore(0) {}
+          safetyScore(0), isEnabled(true) {}
 
     explicit PackageClassification(const std::string& pkg)
         : packageName(pkg), category(PackageCategory::UNCATEGORIZED),
           reason(""), description(""), isOemSpecific(false),
           oemApplicability(OemType::UNKNOWN), canBeDisabled(true),
-          safetyScore(0) {}
+          safetyScore(0), isEnabled(true) {}
 };
 
 /**
