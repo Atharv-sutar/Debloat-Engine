@@ -1,0 +1,6 @@
+E:/All Programs/Atharv C++/Debloat_Engine/DeBloat_AntiGrav/DeBloat/build_gui/CMakeFiles/DebloatBackend.dir
+E:/All Programs/Atharv C++/Debloat_Engine/DeBloat_AntiGrav/DeBloat/build_gui/CMakeFiles/DeBloat.dir
+E:/All Programs/Atharv C++/Debloat_Engine/DeBloat_AntiGrav/DeBloat/build_gui/CMakeFiles/imgui_static.dir
+E:/All Programs/Atharv C++/Debloat_Engine/DeBloat_AntiGrav/DeBloat/build_gui/CMakeFiles/DeBloatGui.dir
+E:/All Programs/Atharv C++/Debloat_Engine/DeBloat_AntiGrav/DeBloat/build_gui/CMakeFiles/edit_cache.dir
+E:/All Programs/Atharv C++/Debloat_Engine/DeBloat_AntiGrav/DeBloat/build_gui/CMakeFiles/rebuild_cache.dir
