@@ -3,6 +3,8 @@
 #include "backends/imgui_impl_win32.h"
 #include "backends/imgui_impl_opengl2.h"
 #include <gl/GL.h>
+#include <algorithm>
+#include <cctype>
 #include <iostream>
 
 static const char* kWindowTitle = "DeBloat GUI";
@@ -97,15 +99,35 @@ bool GuiApp::Initialize()
         return false;
     }
 
+    HMONITOR monitor = MonitorFromPoint({0, 0}, MONITOR_DEFAULTTOPRIMARY);
+    MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+    if (!GetMonitorInfo(monitor, &monitorInfo))
+    {
+        monitorInfo.rcWork.left = 0;
+        monitorInfo.rcWork.top = 0;
+        monitorInfo.rcWork.right = kWindowWidth;
+        monitorInfo.rcWork.bottom = kWindowHeight;
+    }
+
+    int screenWidth = monitorInfo.rcWork.right - monitorInfo.rcWork.left;
+    int screenHeight = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+    int windowWidth = std::min(kWindowWidth, screenWidth - 40);
+    int windowHeight = std::min(kWindowHeight, screenHeight - 40);
+    int windowX = monitorInfo.rcWork.left + (screenWidth - windowWidth) / 2;
+    int windowY = monitorInfo.rcWork.top + (screenHeight - windowHeight) / 2;
+
+    RECT windowRect = { 0, 0, windowWidth, windowHeight };
+    AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+
     hwnd = CreateWindowEx(
         0,
         kWindowClassName,
         kWindowTitle,
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT,
-        CW_USEDEFAULT,
-        kWindowWidth,
-        kWindowHeight,
+        windowX,
+        windowY,
+        windowRect.right - windowRect.left,
+        windowRect.bottom - windowRect.top,
         nullptr,
         nullptr,
         wc.hInstance,
@@ -155,12 +177,19 @@ bool GuiApp::Initialize()
         return false;
     }
 
-    ShowWindow(hwnd, SW_SHOWDEFAULT);
+    ShowWindow(hwnd, SW_SHOWMAXIMIZED);
     UpdateWindow(hwnd);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 17.0f);
+    if (font == nullptr)
+    {
+        io.Fonts->AddFontDefault();
+    }
 
     ImGui_ImplWin32_Init(hwnd);
     ImGui_ImplOpenGL2_Init();
@@ -206,7 +235,11 @@ void GuiApp::RenderFrame()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("DeBloat Dashboard");
+    RECT clientRect;
+    GetClientRect(hwnd, &clientRect);
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(clientRect.right), static_cast<float>(clientRect.bottom)), ImGuiCond_Once);
+    ImGui::Begin("DeBloat Dashboard", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
     ImGui::Text("Device Management");
     ImGui::Separator();
 
@@ -247,7 +280,7 @@ void GuiApp::RenderFrame()
     }
 
     ImGui::Spacing();
-    const char* categoryNames[] = {"All Categories", "Critical", "Bloatware", "Analytics", "Optional"};
+    const char* categoryNames[] = {"All Categories", "Critical", "Bloatware", "Analytics", "Optional", "User", "Unknown"};
     if (ImGui::Combo("Category Filter", &selectedCategoryIndex, categoryNames, IM_ARRAYSIZE(categoryNames)))
     {
         switch (selectedCategoryIndex)
@@ -256,6 +289,8 @@ void GuiApp::RenderFrame()
             case 2: activeCategory = PackageCategory::SAFE_TO_REMOVE; break;
             case 3: activeCategory = PackageCategory::ANALYTICS; break;
             case 4: activeCategory = PackageCategory::OPTIONAL; break;
+            case 5: activeCategory = PackageCategory::USER_APP; break;
+            case 6: activeCategory = PackageCategory::UNCATEGORIZED; break;
             default: activeCategory = PackageCategory::UNCATEGORIZED; break;
         }
     }
@@ -264,25 +299,62 @@ void GuiApp::RenderFrame()
     ImGui::Text("Device Serial: %s", hasDevice ? selectedDeviceSerial.c_str() : "None");
     ImGui::Separator();
 
+    ImGui::InputText("Search packages", packageSearchBuffer, IM_ARRAYSIZE(packageSearchBuffer));
+    ImGui::SameLine();
+    if (ImGui::Button("Clear"))
+    {
+        packageSearchBuffer[0] = '\0';
+    }
+    ImGui::Separator();
+
     if (hasScanResults)
     {
         ImGui::Text("Scan Results");
         ImGui::Separator();
         ImGui::Text("Package count: %d", static_cast<int>(allPackages.size()));
-        ImGui::Text("Selected category: %s", GetCategoryName(activeCategory).c_str());
+        ImGui::Text("Selected category: %s", selectedCategoryIndex == 0 ? "All Categories" : GetCategoryName(activeCategory).c_str());
         ImGui::Checkbox("Show only disabled packages", &showOnlyDisabled);
 
+        const auto toLower = [](const std::string& value)
+        {
+            std::string lower = value;
+            std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return std::tolower(c); });
+            return lower;
+        };
+
+        std::string searchFilter = packageSearchBuffer;
+        std::string searchLower = toLower(searchFilter);
+
         ImGui::BeginChild("PackageList", ImVec2(0, 360), true);
+        ImGui::Columns(3, "PackageColumns", false);
+        ImGui::SetColumnWidth(0, 520);
+        ImGui::TextUnformatted("Package");
+        ImGui::NextColumn();
+        ImGui::TextUnformatted("Category");
+        ImGui::NextColumn();
+        ImGui::TextUnformatted("Status");
+        ImGui::NextColumn();
+        ImGui::Separator();
+
+        int selectedCount = 0;
         for (size_t i = 0; i < classifiedPackages.size(); ++i)
         {
             const auto& pkg = classifiedPackages[i];
-            if (activeCategory != PackageCategory::UNCATEGORIZED && pkg.category != activeCategory)
+            if (selectedCategoryIndex != 0 && pkg.category != activeCategory)
             {
                 continue;
             }
             if (showOnlyDisabled && pkg.isEnabled)
             {
                 continue;
+            }
+            if (!searchLower.empty())
+            {
+                std::string packageNameLower = toLower(pkg.packageName);
+                if (packageNameLower.find(searchLower) == std::string::npos)
+                {
+                    continue;
+                }
             }
 
             bool selected = selectedPackageFlags.size() > i ? selectedPackageFlags[i] : false;
@@ -294,8 +366,37 @@ void GuiApp::RenderFrame()
                 }
                 selectedPackageFlags[i] = selected;
             }
-            ImGui::SameLine(420);
-            ImGui::Text("[%s] %s", pkg.canBeDisabled ? "USR" : "SYS", pkg.isEnabled ? "ENABLED" : "DISABLED");
+            ImGui::NextColumn();
+
+            ImGui::Text("%s", GetCategoryName(pkg.category).c_str());
+            ImGui::NextColumn();
+            ImGui::Text("%s", pkg.isEnabled ? "ENABLED" : "DISABLED");
+            ImGui::NextColumn();
+
+            if (selected)
+            {
+                selectedCount++;
+            }
+        }
+        ImGui::Columns(1);
+        ImGui::EndChild();
+
+        ImGui::Spacing();
+        ImGui::Text("Selected Packages (%d)", selectedCount);
+        ImGui::BeginChild("SelectedPackages", ImVec2(0, 120), true);
+        if (selectedCount == 0)
+        {
+            ImGui::TextDisabled("No packages selected.");
+        }
+        else
+        {
+            for (size_t i = 0; i < classifiedPackages.size(); ++i)
+            {
+                if (i < selectedPackageFlags.size() && selectedPackageFlags[i])
+                {
+                    ImGui::TextWrapped("%s", classifiedPackages[i].packageName.c_str());
+                }
+            }
         }
         ImGui::EndChild();
 
@@ -308,6 +409,11 @@ void GuiApp::RenderFrame()
         if (ImGui::Button("Uninstall Selected"))
         {
             PerformRemoval(RemovalAction::UNINSTALL);
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Enable Selected"))
+        {
+            EnableSelectedPackages();
         }
         ImGui::SameLine();
         if (ImGui::Button("Restore Disabled"))
@@ -328,10 +434,9 @@ void GuiApp::RenderFrame()
     ImGui::End();
 
     ImGui::Render();
-    RECT rect;
-    GetClientRect(hwnd, &rect);
-    int width = rect.right - rect.left;
-    int height = rect.bottom - rect.top;
+    GetClientRect(hwnd, &clientRect);
+    int width = clientRect.right - clientRect.left;
+    int height = clientRect.bottom - clientRect.top;
     glViewport(0, 0, width, height);
     glClearColor(0.11f, 0.12f, 0.15f, 1.00f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -396,11 +501,15 @@ void GuiApp::ClassifyPackages()
     auto safeList = pkgClassifier->ClassifyMultiple(allPackages, PackageCategory::SAFE_TO_REMOVE);
     auto optionalList = pkgClassifier->ClassifyMultiple(allPackages, PackageCategory::OPTIONAL);
     auto analyticsList = pkgClassifier->ClassifyMultiple(allPackages, PackageCategory::ANALYTICS);
+    auto userList = pkgClassifier->ClassifyMultiple(allPackages, PackageCategory::USER_APP);
+    auto unknownList = pkgClassifier->ClassifyMultiple(allPackages, PackageCategory::UNCATEGORIZED);
     auto criticalList = pkgClassifier->ClassifyMultiple(allPackages, PackageCategory::DO_NOT_TOUCH);
 
     classifiedPackages.insert(classifiedPackages.end(), safeList.begin(), safeList.end());
     classifiedPackages.insert(classifiedPackages.end(), optionalList.begin(), optionalList.end());
     classifiedPackages.insert(classifiedPackages.end(), analyticsList.begin(), analyticsList.end());
+    classifiedPackages.insert(classifiedPackages.end(), userList.begin(), userList.end());
+    classifiedPackages.insert(classifiedPackages.end(), unknownList.begin(), unknownList.end());
     classifiedPackages.insert(classifiedPackages.end(), criticalList.begin(), criticalList.end());
     if (selectedPackageFlags.size() < classifiedPackages.size())
     {
@@ -416,18 +525,65 @@ void GuiApp::PerformRemoval(RemovalAction action)
         return;
     }
 
+    auto findPackageByName = [&](const std::string& name) -> const Package*
+    {
+        for (const auto& pkg : allPackages)
+        {
+            if (pkg.packageName == name)
+            {
+                return &pkg;
+            }
+        }
+        return nullptr;
+    };
+
     std::vector<std::string> packagesToRemove;
+    bool skippedSystemPackage = false;
+
     for (size_t i = 0; i < classifiedPackages.size(); ++i)
     {
-        if (i < selectedPackageFlags.size() && selectedPackageFlags[i])
+        if (!(i < selectedPackageFlags.size() && selectedPackageFlags[i]))
         {
-            packagesToRemove.push_back(classifiedPackages[i].packageName);
+            continue;
         }
+
+        const auto& classifiedPackage = classifiedPackages[i];
+        const Package* originalPackage = findPackageByName(classifiedPackage.packageName);
+        if (!originalPackage)
+        {
+            PushLog("Skipping unknown package: " + classifiedPackage.packageName);
+            continue;
+        }
+
+        if (action == RemovalAction::DISABLE)
+        {
+            if (classifiedPackage.category == PackageCategory::DO_NOT_TOUCH)
+            {
+                PushLog("Skipping critical package for disable: " + classifiedPackage.packageName);
+                skippedSystemPackage = true;
+                continue;
+            }
+            if (!classifiedPackage.canBeDisabled)
+            {
+                PushLog("Skipping package that cannot be disabled safely: " + classifiedPackage.packageName);
+                skippedSystemPackage = true;
+                continue;
+            }
+        }
+
+        packagesToRemove.push_back(classifiedPackage.packageName);
     }
 
     if (packagesToRemove.empty())
     {
-        PushLog("No packages selected for removal.");
+        if (skippedSystemPackage)
+        {
+            PushLog("No valid user packages selected for disable.");
+        }
+        else
+        {
+            PushLog("No packages selected for removal.");
+        }
         return;
     }
 
@@ -457,6 +613,36 @@ void GuiApp::RestoreDisabledPackages()
     {
         auto result = removalEngine->EnablePackage(packageName);
         PushLog("Restore " + packageName + ": " + (result.status == RemovalStatus::SUCCESS ? "Success" : "Failed") + " - " + result.message);
+    }
+}
+
+void GuiApp::EnableSelectedPackages()
+{
+    if (!removalEngine)
+    {
+        PushLog("No removal engine initialized.");
+        return;
+    }
+
+    std::vector<std::string> packagesToEnable;
+    for (size_t i = 0; i < classifiedPackages.size(); ++i)
+    {
+        if (i < selectedPackageFlags.size() && selectedPackageFlags[i])
+        {
+            packagesToEnable.push_back(classifiedPackages[i].packageName);
+        }
+    }
+
+    if (packagesToEnable.empty())
+    {
+        PushLog("No packages selected to enable.");
+        return;
+    }
+
+    for (const auto& packageName : packagesToEnable)
+    {
+        auto result = removalEngine->EnablePackage(packageName);
+        PushLog("Enable " + packageName + ": " + (result.status == RemovalStatus::SUCCESS ? "Success" : "Failed") + " - " + result.message);
     }
 }
 

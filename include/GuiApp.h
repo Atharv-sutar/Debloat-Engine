@@ -30,6 +30,7 @@ private:
     void ClassifyPackages();
     void PerformRemoval(RemovalAction action);
     void RestoreDisabledPackages();
+    void EnableSelectedPackages();
     void PushLog(const std::string& message);
     const std::string& GetSelectedDeviceSerial() const;
     std::string GetAuthStatusName(AuthStatus status) const;
@@ -48,6 +49,7 @@ private:
     std::vector<Package> allPackages;
     std::vector<PackageClassification> classifiedPackages;
     std::vector<bool> selectedPackageFlags;
+    char packageSearchBuffer[256] = "";
     std::vector<RemovalResult> lastRemovalResults;
     std::vector<std::string> activityLog;
 
