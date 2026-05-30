@@ -48,7 +48,7 @@ private:
     std::vector<AndroidDevice> connectedDevices;
     std::vector<Package> allPackages;
     std::vector<PackageClassification> classifiedPackages;
-    std::vector<bool> selectedPackageFlags;
+    std::unordered_set<std::string> selectedPackageNames;
     char packageSearchBuffer[256] = "";
     std::vector<RemovalResult> lastRemovalResults;
     std::vector<std::string> activityLog;

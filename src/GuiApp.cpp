@@ -7,10 +7,10 @@
 #include <cctype>
 #include <iostream>
 
-static const char* kWindowTitle = "DeBloat GUI";
+static const char *kWindowTitle = "DeBloat GUI";
 static const int kWindowWidth = 1280;
 static const int kWindowHeight = 800;
-static const char* kWindowClassName = "DeBloatGuiWindowClass";
+static const char *kWindowClassName = "DeBloatGuiWindowClass";
 
 GuiApp::GuiApp()
     : pkgMgr(nullptr), pkgClassifier(nullptr), removalEngine(nullptr), hwnd(nullptr), hdc(nullptr), glContext(nullptr), selectedDeviceIndex(0), selectedCategoryIndex(0)
@@ -33,21 +33,21 @@ static LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
     switch (msg)
     {
-        case WM_SIZE:
-            if (wParam != SIZE_MINIMIZED)
-            {
-                RECT rect;
-                GetClientRect(hWnd, &rect);
-                glViewport(0, 0, rect.right - rect.left, rect.bottom - rect.top);
-            }
+    case WM_SIZE:
+        if (wParam != SIZE_MINIMIZED)
+        {
+            RECT rect;
+            GetClientRect(hWnd, &rect);
+            glViewport(0, 0, rect.right - rect.left, rect.bottom - rect.top);
+        }
+        return 0;
+    case WM_SYSCOMMAND:
+        if ((wParam & 0xfff0) == SC_KEYMENU)
             return 0;
-        case WM_SYSCOMMAND:
-            if ((wParam & 0xfff0) == SC_KEYMENU)
-                return 0;
-            break;
-        case WM_DESTROY:
-            PostQuitMessage(0);
-            return 0;
+        break;
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
     }
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
@@ -100,7 +100,7 @@ bool GuiApp::Initialize()
     }
 
     HMONITOR monitor = MonitorFromPoint({0, 0}, MONITOR_DEFAULTTOPRIMARY);
-    MONITORINFO monitorInfo = { sizeof(monitorInfo) };
+    MONITORINFO monitorInfo = {sizeof(monitorInfo)};
     if (!GetMonitorInfo(monitor, &monitorInfo))
     {
         monitorInfo.rcWork.left = 0;
@@ -116,7 +116,7 @@ bool GuiApp::Initialize()
     int windowX = monitorInfo.rcWork.left + (screenWidth - windowWidth) / 2;
     int windowY = monitorInfo.rcWork.top + (screenHeight - windowHeight) / 2;
 
-    RECT windowRect = { 0, 0, windowWidth, windowHeight };
+    RECT windowRect = {0, 0, windowWidth, windowHeight};
     AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
     hwnd = CreateWindowEx(
@@ -184,8 +184,8 @@ bool GuiApp::Initialize()
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
 
-    ImGuiIO& io = ImGui::GetIO();
-    ImFont* font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 17.0f);
+    ImGuiIO &io = ImGui::GetIO();
+    ImFont *font = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 17.0f);
     if (font == nullptr)
     {
         io.Fonts->AddFontDefault();
@@ -262,8 +262,8 @@ void GuiApp::RenderFrame()
     }
     else
     {
-        std::vector<const char*> deviceLabels;
-        for (auto& device : connectedDevices)
+        std::vector<const char *> deviceLabels;
+        for (auto &device : connectedDevices)
         {
             deviceLabels.push_back(device.serialNumber.c_str());
         }
@@ -280,18 +280,32 @@ void GuiApp::RenderFrame()
     }
 
     ImGui::Spacing();
-    const char* categoryNames[] = {"All Categories", "Critical", "Bloatware", "Analytics", "Optional", "User", "Unknown"};
+    const char *categoryNames[] = {"All Categories", "Critical", "Bloatware", "Analytics", "Optional", "User", "Unknown"};
     if (ImGui::Combo("Category Filter", &selectedCategoryIndex, categoryNames, IM_ARRAYSIZE(categoryNames)))
     {
         switch (selectedCategoryIndex)
         {
-            case 1: activeCategory = PackageCategory::DO_NOT_TOUCH; break;
-            case 2: activeCategory = PackageCategory::SAFE_TO_REMOVE; break;
-            case 3: activeCategory = PackageCategory::ANALYTICS; break;
-            case 4: activeCategory = PackageCategory::OPTIONAL; break;
-            case 5: activeCategory = PackageCategory::USER_APP; break;
-            case 6: activeCategory = PackageCategory::UNCATEGORIZED; break;
-            default: activeCategory = PackageCategory::UNCATEGORIZED; break;
+        case 1:
+            activeCategory = PackageCategory::DO_NOT_TOUCH;
+            break;
+        case 2:
+            activeCategory = PackageCategory::SAFE_TO_REMOVE;
+            break;
+        case 3:
+            activeCategory = PackageCategory::ANALYTICS;
+            break;
+        case 4:
+            activeCategory = PackageCategory::OPTIONAL;
+            break;
+        case 5:
+            activeCategory = PackageCategory::USER_APP;
+            break;
+        case 6:
+            activeCategory = PackageCategory::UNCATEGORIZED;
+            break;
+        default:
+            activeCategory = PackageCategory::UNCATEGORIZED;
+            break;
         }
     }
 
@@ -315,10 +329,11 @@ void GuiApp::RenderFrame()
         ImGui::Text("Selected category: %s", selectedCategoryIndex == 0 ? "All Categories" : GetCategoryName(activeCategory).c_str());
         ImGui::Checkbox("Show only disabled packages", &showOnlyDisabled);
 
-        const auto toLower = [](const std::string& value)
+        const auto toLower = [](const std::string &value)
         {
             std::string lower = value;
-            std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return std::tolower(c); });
+            std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c)
+                           { return std::tolower(c); });
             return lower;
         };
 
@@ -339,7 +354,7 @@ void GuiApp::RenderFrame()
         int selectedCount = 0;
         for (size_t i = 0; i < classifiedPackages.size(); ++i)
         {
-            const auto& pkg = classifiedPackages[i];
+            const auto &pkg = classifiedPackages[i];
             if (selectedCategoryIndex != 0 && pkg.category != activeCategory)
             {
                 continue;
@@ -357,14 +372,13 @@ void GuiApp::RenderFrame()
                 }
             }
 
-            bool selected = selectedPackageFlags.size() > i ? selectedPackageFlags[i] : false;
+            bool selected = selectedPackageNames.count(pkg.packageName) > 0;
             if (ImGui::Checkbox(pkg.packageName.c_str(), &selected))
             {
-                if (selectedPackageFlags.size() <= i)
-                {
-                    selectedPackageFlags.resize(i + 1, false);
-                }
-                selectedPackageFlags[i] = selected;
+                if (selected)
+                    selectedPackageNames.insert(pkg.packageName);
+                else
+                    selectedPackageNames.erase(pkg.packageName);
             }
             ImGui::NextColumn();
 
@@ -425,7 +439,7 @@ void GuiApp::RenderFrame()
     ImGui::Separator();
     ImGui::Text("Activity Log");
     ImGui::BeginChild("LogPanel", ImVec2(0, 180), true);
-    for (const auto& entry : activityLog)
+    for (const auto &entry : activityLog)
     {
         ImGui::TextWrapped("%s", entry.c_str());
     }
@@ -525,9 +539,9 @@ void GuiApp::PerformRemoval(RemovalAction action)
         return;
     }
 
-    auto findPackageByName = [&](const std::string& name) -> const Package*
+    auto findPackageByName = [&](const std::string &name) -> const Package *
     {
-        for (const auto& pkg : allPackages)
+        for (const auto &pkg : allPackages)
         {
             if (pkg.packageName == name)
             {
@@ -547,8 +561,8 @@ void GuiApp::PerformRemoval(RemovalAction action)
             continue;
         }
 
-        const auto& classifiedPackage = classifiedPackages[i];
-        const Package* originalPackage = findPackageByName(classifiedPackage.packageName);
+        const auto &classifiedPackage = classifiedPackages[i];
+        const Package *originalPackage = findPackageByName(classifiedPackage.packageName);
         if (!originalPackage)
         {
             PushLog("Skipping unknown package: " + classifiedPackage.packageName);
@@ -588,7 +602,7 @@ void GuiApp::PerformRemoval(RemovalAction action)
     }
 
     lastRemovalResults = removalEngine->RemoveMultiple(packagesToRemove, action, false);
-    for (const auto& result : lastRemovalResults)
+    for (const auto &result : lastRemovalResults)
     {
         PushLog(result.packageName + ": " + (result.status == RemovalStatus::SUCCESS ? "Success" : "Failed") + " - " + result.message);
     }
@@ -609,7 +623,7 @@ void GuiApp::RestoreDisabledPackages()
         return;
     }
 
-    for (const auto& packageName : disabledPackages)
+    for (const auto &packageName : disabledPackages)
     {
         auto result = removalEngine->EnablePackage(packageName);
         PushLog("Restore " + packageName + ": " + (result.status == RemovalStatus::SUCCESS ? "Success" : "Failed") + " - " + result.message);
@@ -639,14 +653,14 @@ void GuiApp::EnableSelectedPackages()
         return;
     }
 
-    for (const auto& packageName : packagesToEnable)
+    for (const auto &packageName : packagesToEnable)
     {
         auto result = removalEngine->EnablePackage(packageName);
         PushLog("Enable " + packageName + ": " + (result.status == RemovalStatus::SUCCESS ? "Success" : "Failed") + " - " + result.message);
     }
 }
 
-void GuiApp::PushLog(const std::string& message)
+void GuiApp::PushLog(const std::string &message)
 {
     activityLog.push_back(message);
     if (activityLog.size() > 50)
@@ -655,7 +669,7 @@ void GuiApp::PushLog(const std::string& message)
     }
 }
 
-const std::string& GuiApp::GetSelectedDeviceSerial() const
+const std::string &GuiApp::GetSelectedDeviceSerial() const
 {
     return selectedDeviceSerial;
 }
@@ -664,10 +678,14 @@ std::string GuiApp::GetAuthStatusName(AuthStatus status) const
 {
     switch (status)
     {
-        case AuthStatus::AUTHORIZED: return "AUTHORIZED";
-        case AuthStatus::UNAUTHORIZED: return "UNAUTHORIZED";
-        case AuthStatus::OFFLINE: return "OFFLINE";
-        default: return "UNKNOWN";
+    case AuthStatus::AUTHORIZED:
+        return "AUTHORIZED";
+    case AuthStatus::UNAUTHORIZED:
+        return "UNAUTHORIZED";
+    case AuthStatus::OFFLINE:
+        return "OFFLINE";
+    default:
+        return "UNKNOWN";
     }
 }
 
